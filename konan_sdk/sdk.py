@@ -1,13 +1,12 @@
 import json
 import sys
-from collections.abc import Sequence
-from typing import Optional, Dict, Any, Union
+from typing import Optional, Dict, Union, Tuple
 
 import requests
+from loguru import logger
 
 from konan_sdk.endpoints import LOGIN_ENDPOINT, get_predict_endpoint, TOKEN_REFRESH_ENDPOINT
 from konan_sdk.konan_user import KonanUser
-from loguru import logger
 
 
 class KonanSDK:
@@ -73,7 +72,7 @@ class KonanSDK:
 
         self.user.set_access_token(data['access'])
 
-    def predict(self, project_uuid: str, input_data: Union[Dict, str]) -> Sequence[str, Dict]:
+    def predict(self, project_uuid: str, input_data: Union[Dict, str]) -> Tuple[str, Dict]:
         self._post_login_checks()
 
         # Convert input to json string if it's a dict
