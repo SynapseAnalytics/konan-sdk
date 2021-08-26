@@ -12,8 +12,8 @@ class TokenType(Enum):
 
 class KonanUser:
     def __init__(self, access_token: str, refresh_token: str) -> None:
-        self.access_token = access_token
-        self.refresh_token = refresh_token
+        self.access_token = None
+        self.refresh_token = None
 
         # User Details
         self.email = ''
@@ -29,6 +29,8 @@ class KonanUser:
         self.set_refresh_token(refresh_token)
 
     def set_access_token(self, access_token: str) -> None:
+        self.access_token = access_token
+
         access_token_payload = jwt.decode(access_token, options={"verify_signature": False})
 
         # Get user details
@@ -40,6 +42,8 @@ class KonanUser:
         self.access_exp = access_token_payload['exp']
 
     def set_refresh_token(self, refresh_token: str) -> None:
+        self.refresh_token = refresh_token
+        
         refresh_token_payload = jwt.decode(refresh_token, options={"verify_signature": False})
 
         self.refresh_exp = refresh_token_payload['exp']
