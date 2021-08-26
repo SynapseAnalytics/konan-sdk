@@ -1,7 +1,7 @@
 import json
 import sys
 from collections.abc import Sequence
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Union
 
 import requests
 
@@ -73,9 +73,14 @@ class KonanSDK:
 
         self.user.set_access_token(data['access'])
 
-    def predict(self, project_uuid: str, input_data: Dict) -> Sequence[str, Dict]:
+    def predict(self, project_uuid: str, input_data: Union[Dict, str]) -> Sequence[str, Dict]:
         self._post_login_checks()
 
+        # Convert input to json string if it's a dict
+        if isinstance(input_data, Dict):
+            input_data = json.dumps(input_data)
+
+        # Check if access token is valid and retrieve a new one if needed
         if not self.user.is_access_valid():
             if self.user.is_refresh_valid():
                 logger.debug(f"Access token has expired. Refreshing.")
@@ -91,7 +96,7 @@ class KonanSDK:
                 'Authorization': f"Bearer {self.user.access_token}",
                 'Content-Type': 'application/json',
             },
-            data=json.dumps(input_data)
+            data=input_data
         )
         logger.debug("Received prediction response. Parsing output.")
 
