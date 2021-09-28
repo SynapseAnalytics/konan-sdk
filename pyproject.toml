@@ -1,11 +1,15 @@
 [tool.poetry]
 name = "konan-sdk"
 version = "1.0.0"
-description = ""
+description = "Python SDK for Konan's API"
 authors = ["Synapse Analytics"]
 license = "MIT"
 readme = "README.md"
 documentation = "https://docs.konan.ai"
+repository = "https://github.com/SynapseAnalytics/konan-sdk"
+
+[tool.poetry.urls]
+"Konan Website" = "https://konan.ai"
 
 [tool.poetry.dependencies]
 python = "^3.7"
