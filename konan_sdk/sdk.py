@@ -72,7 +72,7 @@ class KonanSDK:
 
         self.user.set_access_token(data['access'])
 
-    def predict(self, project_uuid: str, input_data: Union[Dict, str]) -> Tuple[str, Dict]:
+    def predict(self, deployment_uuid: str, input_data: Union[Dict, str]) -> Tuple[str, Dict]:
         self._post_login_checks()
 
         # Convert input to json string if it's a dict
@@ -90,7 +90,7 @@ class KonanSDK:
 
         logger.debug("Sending prediction request.")
         response = requests.post(
-            get_predict_endpoint(self.api_url, project_uuid),
+            get_predict_endpoint(self.api_url, deployment_uuid),
             headers={
                 'Authorization': f"Bearer {self.user.access_token}",
                 'Content-Type': 'application/json',

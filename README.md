@@ -14,7 +14,7 @@ if __name__ == '__main__':
     input_data = {"feature_1": 1, "feature_2": "abc", }
 
     # Run the prediction
-    prediction_uuid, ml_output = sdk.predict("<project_uuid>", input_data)
+    prediction_uuid, ml_output = sdk.predict("<deployment_uuid>", input_data)
 
     # Print the returned output
     print(prediction_uuid, ml_output)
