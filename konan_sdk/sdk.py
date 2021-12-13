@@ -82,10 +82,10 @@ class KonanSDK:
         # Check if access token is valid and retrieve a new one if needed
         if not self.user.is_access_valid():
             if self.user.is_refresh_valid():
-                logger.debug(f"Access token has expired. Refreshing.")
+                logger.debug("Access token has expired. Refreshing.")
                 self.refresh_token()
             else:
-                logger.debug(f"Both access and refresh tokens have expired, re-logging in.")
+                logger.debug("Both access and refresh tokens have expired, re-logging in.")
                 self.login(self.email, self.password)
 
         logger.debug("Sending prediction request.")
