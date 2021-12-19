@@ -4,6 +4,9 @@ from fastapi import FastAPI, Response
 from fastapi_utils.cbv import cbv
 
 from konan_sdk.konan_service.routers import KonanServiceRouter
+from konan_sdk.konan_service.serializers import (
+    KonanServiceBaseEvaluateRequest, KonanServiceEvaluateResponse
+)
 
 
 class KonanService():
@@ -14,6 +17,8 @@ class KonanService():
         predict_request_class: Type,
         predict_response_class: Type,
         model_class: Type,
+        feedback_target_class: Type = None,
+        evaluate_response_class: Type = KonanServiceEvaluateResponse,
         *model_args, **model_kwargs,
     ) -> None:
         """Initializes a konan service
@@ -26,10 +31,23 @@ class KonanService():
             model_class (Type): Type of the model that does the prediction.
                 Should be a class that inherits from KonanServiceBaseModel.
                 Must implement the preprocess_input(), predict(), and postprocess_output() methods
+            feedback_target_class (Type, optional): Type of feedback target.
+                Defaults to value of predict_response_class if None.
+            evaluate_response_class (Type, optional): Type of an evaluation response.
+                Should be a class that inherits from KonanServiceEvaluateResponse.
+                Defaults to KonanServiceEvaluateResponse.
         """
         self.model = model_class(*model_args, **model_kwargs)
         self.app = FastAPI(openapi_url='/docs', docs_url='/swagger')
-        router = KonanServiceRouter(predict_response_class=predict_response_class)
+        feedback_target_class = feedback_target_class or predict_response_class
+
+        class ServiceEvaluateRequest(KonanServiceBaseEvaluateRequest):
+            target: feedback_target_class
+
+        router = KonanServiceRouter(
+            predict_response_class=predict_response_class,
+            evaluate_response_class=evaluate_response_class,
+        )
 
         @cbv(router)
         class KonanRoutes():
@@ -46,6 +64,11 @@ class KonanService():
             def predict(self, req: predict_request_class) -> predict_response_class:
                 prediction = self.__model.predict(req)
                 return prediction
+
+            @router.evaluate()
+            def evaluate(self, req: ServiceEvaluateRequest) -> evaluate_response_class:
+                evaluation = self.__model.evaluate(req)
+                return evaluation
 
         self.app.include_router(router)
 
