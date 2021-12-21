@@ -6,10 +6,11 @@ from typing import Optional
 
 from konan_sdk.konan_user import KonanUser
 from konan_sdk.endpoints.utils import LOGIN_ENDPOINT, TOKEN_REFRESH_ENDPOINT
+from konan_sdk.endpoints.konan_endpoints import LoginEndpoint
 
 
 class KonanAuth:
-    def __init__(self, auth_url: str, email: str, password: str):
+    def __init__(self, auth_url: str, email: str, password: str): # TODO: make auth only a class
 
         self.auth_url = auth_url
         self.email = email
@@ -19,25 +20,14 @@ class KonanAuth:
 
     def login(self) -> KonanUser:
 
-        payload = { 'email': self.email,
+        payload =  { 'email': self.email,
                     'password': self.password}
 
-        # Login using provided credentials
-        response = requests.post(
-            self.auth_url + LOGIN_ENDPOINT,
-            data=payload
-        )
-        # Raise any HTTP errors > 400
-        # TODO: Check for 401, would mean invalid credentials were supplied
-        response.raise_for_status()
-
-        # Extract authentication tokens
-        tokens = response.json()
-
-        # Create a new user using these token
-        self.user = KonanUser(tokens['access'], tokens['refresh'])
+        response = LoginEndpoint(api_url=self.auth_url, user=self.user).post(payload=payload)
 
         logger.info(f"Successfully logged in using {self.email}")
+
+        self.user = KonanUser(response['access'], response['refresh'])
 
         return self.user
 

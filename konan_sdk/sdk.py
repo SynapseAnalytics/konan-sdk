@@ -1,5 +1,5 @@
 import json
-from konan_sdk.endpoints.auth import KonanAuth
+from konan_sdk.auth import KonanAuth
 import sys
 from typing import Optional, Dict, Union, Tuple
 
