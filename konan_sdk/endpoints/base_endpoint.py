@@ -19,8 +19,18 @@ class KonanBaseEndpoint:
         self.name = name
         self.user = user
 
+        self.request_url = ''
+        self.response = {}
 
-    def post(self, api_url, payload):
+    def prepare_request(self, *kwargs):
+        pass
+
+    def process_response(self, *kwargs):
+        pass
+
+    def post(self, payload):
+
+        self.prepare_request()
 
         # Convert input to json string if it's a dict
         if isinstance(payload, Dict):
@@ -30,7 +40,7 @@ class KonanBaseEndpoint:
 
         # send request
         response = requests.post(
-            api_url,
+            self.request_url,
             headers={
                 'Authorization': f"Bearer {self.user.access_token}",
                 'Content-Type': 'application/json',
@@ -44,12 +54,17 @@ class KonanBaseEndpoint:
 
         response.raise_for_status()
 
-        data = response.json()
+        self.response = response.json()
 
-        return data
+        self.process_response()
+
+        return self.response
+
 
 
     def get(self, api_url):
+
+        self.prepare_request()
 
         logger.debug(f"Sending {self.name} request")
 
@@ -68,7 +83,9 @@ class KonanBaseEndpoint:
 
         response.raise_for_status()
 
-        data = response.json()
+        self.response = response.json()
 
-        return data
+        self.process_response()
+
+        return self.response
 
