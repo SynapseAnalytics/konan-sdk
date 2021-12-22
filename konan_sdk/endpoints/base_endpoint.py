@@ -1,10 +1,3 @@
-
-
-
-# base class, checks login, refreh token, get and post
-# class for each endpoint, inherits from base class, has hit endpoint, hit endpoint calls super to include hit from base class
-# konan sdk wrapper for endpoint classes, instantiate endpoint classes and calls them
-# store parameters in self instead of passing as args
 import json
 from logging import log
 import requests
@@ -23,17 +16,17 @@ class KonanBaseEndpoint:
         self.headers = {}
         self.response = {}
 
-    def prepare_request(self, *kwargs):
+    def prepare_request(self):
         pass
 
-    def process_response(self, *kwargs):
+    def process_response(self):
         pass
 
     def post(self, payload):
 
-        self.prepare_request()            
+        self.prepare_request()
 
-        # Convert input to json string if it's a dict
+        # If request content type is json, convert input dict to json string
         if self.headers and self.headers['Content-Type'] == 'application/json' and isinstance(payload, Dict):
             payload = json.dumps(payload)
 
@@ -55,8 +48,7 @@ class KonanBaseEndpoint:
         self.response = response.json()
 
         self.process_response()
-        print("post response process")
-        print(self.response)
+
         return self.response
 
 

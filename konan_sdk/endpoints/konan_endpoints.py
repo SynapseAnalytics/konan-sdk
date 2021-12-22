@@ -34,11 +34,11 @@ class PredictionEndpoint(KonanBaseEndpoint):
                 'Content-Type': 'application/json',
             }
 
-    def prepare_request(self, *kwargs):
+    def prepare_request(self):
         self.request_url = get_predict_endpoint(api_url=self.api_url, deployment_uuid=self.deployment_uuid)
 
 
-    def process_response(self, *kwargs):
+    def process_response(self):
 
         prediction_uuid = self.response.pop('prediction_uuid')
         self.response = prediction_uuid, self.response
