@@ -6,11 +6,11 @@ from typing import Optional
 
 from konan_sdk.konan_user import KonanUser
 from konan_sdk.endpoints.utils import LOGIN_ENDPOINT, TOKEN_REFRESH_ENDPOINT
-from konan_sdk.endpoints.konan_endpoints import LoginEndpoint
+from konan_sdk.endpoints.konan_endpoints import LoginEndpoint, RefreshTokenEndpoint
 
 
 class KonanAuth:
-    def __init__(self, auth_url: str, email: str, password: str): # TODO: make auth only a class
+    def __init__(self, auth_url: str, email: str, password: str):
 
         self.auth_url = auth_url
         self.email = email
@@ -36,23 +36,11 @@ class KonanAuth:
 
     def refresh_token(self) -> None:
         self._post_login_checks()
+        payload = { "refresh": self.user.refresh_token }
 
-        logger.debug("Sending token refresh request.")
-        response = requests.post(
-            self.auth_url + TOKEN_REFRESH_ENDPOINT,
-            data={
-                "refresh": self.user.refresh_token
-            },
+        response = RefreshTokenEndpoint(api_url=self.auth_url, user=self.user).post(payload=payload)
 
-        )
-        logger.debug("Received token refresh response. Parsing output.")
-
-        response.raise_for_status()
-
-        data = response.json()
-
-        self.user.set_access_token(data['access'])
-
+        self.user.set_access_token(response['access'])
 
     def auto_refresh_token(self) -> None:
 
