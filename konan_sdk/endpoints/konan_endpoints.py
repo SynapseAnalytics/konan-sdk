@@ -1,10 +1,3 @@
-
-import json
-import sys
-from typing import Optional, Dict, Union, Tuple
-
-
-from konan_sdk.konan_user import KonanUser
 from konan_sdk.endpoints.base_endpoint import KonanBaseEndpoint
 from konan_sdk.endpoints.utils import get_predict_endpoint, LOGIN_ENDPOINT, TOKEN_REFRESH_ENDPOINT
 
