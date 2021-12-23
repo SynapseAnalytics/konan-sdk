@@ -1,5 +1,4 @@
 import json
-from logging import log
 import requests
 from loguru import logger
 from typing import Dict, Union
