@@ -10,17 +10,17 @@ from konan_sdk.endpoints.utils import get_predict_endpoint, LOGIN_ENDPOINT, TOKE
 
 
 class LoginEndpoint(KonanBaseEndpoint):
-    def __init__(self, api_url, user):
+    def __init__(self, api_url, user) -> None:
         super().__init__(api_url=api_url, name='login', user=user)
 
-    def prepare_request(self, *kwargs):
+    def prepare_request(self):
         self.request_url = self.api_url + LOGIN_ENDPOINT
 
 class RefreshTokenEndpoint(KonanBaseEndpoint):
     def __init__(self, api_url, user) -> None:
         super().__init__(api_url=api_url, name='refresh_token', user=user)
 
-    def prepare_request(self, *kwargs):
+    def prepare_request(self):
         self.request_url = self.api_url + TOKEN_REFRESH_ENDPOINT
 
 class PredictionEndpoint(KonanBaseEndpoint):

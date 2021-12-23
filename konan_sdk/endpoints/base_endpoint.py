@@ -2,11 +2,11 @@ import json
 from logging import log
 import requests
 from loguru import logger
-from typing import Dict
+from typing import Dict, Union
 
 
 class KonanBaseEndpoint:
-    def __init__(self, api_url, name, user) -> None:
+    def __init__(self, api_url:str, name:str, user) -> None:
 
         self.api_url = api_url
         self.name = name
@@ -22,7 +22,7 @@ class KonanBaseEndpoint:
     def process_response(self):
         pass
 
-    def post(self, payload):
+    def post(self, payload: Union[Dict, str]):
 
         self.prepare_request()
 
@@ -52,8 +52,7 @@ class KonanBaseEndpoint:
         return self.response
 
 
-
-    def get(self, api_url):
+    def get(self, api_url: str):
 
         self.prepare_request()
 
