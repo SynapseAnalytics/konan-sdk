@@ -1,0 +1,8 @@
+[flake8]
+max-line-length = 120
+exclude = .tox,.git,*/migrations/*,*/static/CACHE/*,docs,node_modules,venv,konan/experiment/*
+ignore = E722,W503,F405,F403,E501,E203
+
+[pycodestyle]
+max-line-length = 120
+exclude = .tox,.git,*/migrations/*,*/static/CACHE/*,docs,node_modules,venv,konan/experiment/*
