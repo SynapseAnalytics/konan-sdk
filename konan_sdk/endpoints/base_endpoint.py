@@ -1,3 +1,4 @@
+from abc import abstractmethod
 import json
 import requests
 from loguru import logger
@@ -10,7 +11,6 @@ class KonanBaseEndpoint:
         self.api_url = api_url
         self.user = user
 
-        self.endpoint_path = ''
         self.name = ''
         self.headers = {}
         self.response = {}
@@ -18,6 +18,11 @@ class KonanBaseEndpoint:
     @property
     def request_url(self):
         return self.api_url + self.endpoint_path
+
+    @property
+    @abstractmethod
+    def endpoint_path(self):
+        pass
 
     def prepare_request(self):
         pass
