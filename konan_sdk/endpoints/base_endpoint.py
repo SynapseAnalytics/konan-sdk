@@ -10,10 +10,14 @@ class KonanBaseEndpoint:
         self.api_url = api_url
         self.user = user
 
-        self.request_url = ''
+        self.endpoint_path = ''
         self.name = ''
         self.headers = {}
         self.response = {}
+
+    @property
+    def request_url(self):
+        return self.api_url + self.endpoint_path
 
     def prepare_request(self):
         pass

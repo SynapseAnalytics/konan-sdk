@@ -6,17 +6,15 @@ class LoginEndpoint(KonanBaseEndpoint):
     def __init__(self, api_url, user) -> None:
         super().__init__(api_url=api_url, user=user)
         self.name = 'login'
+        self.endpoint_path = '/api/auth/login/'
 
-    def prepare_request(self):
-        self.request_url = self.api_url + LOGIN_ENDPOINT
 
 class RefreshTokenEndpoint(KonanBaseEndpoint):
     def __init__(self, api_url, user) -> None:
         super().__init__(api_url=api_url, user=user)
-        self.name = 'refresh_token',
+        self.name = 'refresh_token'
+        self.endpoint_path = '/api/auth/token/refresh/'
 
-    def prepare_request(self):
-        self.request_url = self.api_url + TOKEN_REFRESH_ENDPOINT
 
 class PredictionEndpoint(KonanBaseEndpoint):
 
@@ -24,14 +22,12 @@ class PredictionEndpoint(KonanBaseEndpoint):
         super().__init__( api_url=api_url, user=user)
 
         self.name = 'predict'
+        self.endpoint_path = f"/deployments/{deployment_uuid}/predict/"
         self.deployment_uuid = deployment_uuid
         self.headers = {
                 'Authorization': f"Bearer {self.user.access_token}",
                 'Content-Type': 'application/json',
             }
-
-    def prepare_request(self):
-        self.request_url = get_predict_endpoint(api_url=self.api_url, deployment_uuid=self.deployment_uuid)
 
 
     def process_response(self):
