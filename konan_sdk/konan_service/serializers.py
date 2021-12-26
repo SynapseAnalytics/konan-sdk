@@ -49,5 +49,5 @@ class KonanServiceEvaluation(BaseModel):
         use_enum_values = True
 
 
-class KonanServiceEvaluateResponse(BaseModel):
+class KonanServiceBaseEvaluateResponse(BaseModel):
     results: List[KonanServiceEvaluation]

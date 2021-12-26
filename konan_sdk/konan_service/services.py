@@ -1,11 +1,11 @@
-from typing import Type
+from typing import List, Type
 
 from fastapi import FastAPI, Response
 from fastapi_utils.cbv import cbv
 
 from konan_sdk.konan_service.routers import KonanServiceRouter
 from konan_sdk.konan_service.serializers import (
-    KonanServiceBaseEvaluateRequest, KonanServiceEvaluateResponse
+    KonanServiceBaseFeedback, KonanServiceBaseEvaluateRequest, KonanServiceBaseEvaluateResponse
 )
 
 
@@ -18,7 +18,7 @@ class KonanService():
         predict_response_class: Type,
         model_class: Type,
         feedback_target_class: Type = None,
-        evaluate_response_class: Type = KonanServiceEvaluateResponse,
+        evaluate_response_class: Type = KonanServiceBaseEvaluateResponse,
         *model_args, **model_kwargs,
     ) -> None:
         """Initializes a konan service
@@ -30,19 +30,21 @@ class KonanService():
                 Should be a class that inherits from KonanServiceBasePredictionResponse
             model_class (Type): Type of the model that does the prediction.
                 Should be a class that inherits from KonanServiceBaseModel.
-                Must implement the preprocess_input(), predict(), and postprocess_output() methods
+                Must implement the predict() and evaluate() methods
             feedback_target_class (Type, optional): Type of feedback target.
                 Defaults to value of predict_response_class if None.
             evaluate_response_class (Type, optional): Type of an evaluation response.
-                Should be a class that inherits from KonanServiceEvaluateResponse.
-                Defaults to KonanServiceEvaluateResponse.
+                Should be a class that inherits from KonanServiceBaseEvaluateResponse.
+                Defaults to KonanServiceBaseEvaluateResponse.
         """
         self.model = model_class(*model_args, **model_kwargs)
         self.app = FastAPI(openapi_url='/docs', docs_url='/swagger')
         feedback_target_class = feedback_target_class or predict_response_class
 
-        class ServiceEvaluateRequest(KonanServiceBaseEvaluateRequest):
+        class ServiceFeedback(KonanServiceBaseFeedback):
             target: feedback_target_class
+        class ServiceEvaluateRequest(KonanServiceBaseEvaluateRequest):
+            data: List[ServiceFeedback]
 
         router = KonanServiceRouter(
             predict_response_class=predict_response_class,

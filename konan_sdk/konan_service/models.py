@@ -2,7 +2,7 @@ import abc
 
 from konan_sdk.konan_service.serializers import (
     KonanServiceBasePredictionRequest, KonanServiceBasePredictionResponse,
-    KonanServiceBaseEvaluateRequest, KonanServiceEvaluateResponse,
+    KonanServiceBaseEvaluateRequest, KonanServiceBaseEvaluateResponse,
 )
 
 
@@ -21,7 +21,7 @@ class KonanServiceBaseModel(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def evaluate(self, req: KonanServiceBaseEvaluateRequest) -> KonanServiceEvaluateResponse:
+    def evaluate(self, req: KonanServiceBaseEvaluateRequest) -> KonanServiceBaseEvaluateResponse:
         """Evaluates the model using past predictions and their feedback
 
         Args:
