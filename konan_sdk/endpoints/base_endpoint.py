@@ -26,7 +26,7 @@ class KonanBaseEndpoint:
         self.prepare_request()
 
         # If request content type is json, convert input dict to json string
-        if self.headers and dict(self.headers).get("Content-Type", "") == 'application/json' and isinstance(payload, Dict):
+        if self.headers and dict(self.headers).get('Content-Type', '') == 'application/json' and isinstance(payload, Dict):
             payload = json.dumps(payload)
 
         logger.debug(f"Sending {self.name} request")
@@ -41,8 +41,6 @@ class KonanBaseEndpoint:
         response.raise_for_status()
 
         logger.debug(f"Received response from {self.name}, parsing output")
-
-        response.raise_for_status()
 
         self.response = response.json()
 
