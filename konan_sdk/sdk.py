@@ -1,10 +1,10 @@
 import sys
-from typing import Optional, Dict, Union, Tuple
-
 from loguru import logger
+from typing import Optional, Dict, Union, Tuple
 
 from konan_sdk.auth import KonanAuth
 from konan_sdk.endpoints.konan_endpoints import PredictionEndpoint
+
 
 class KonanSDK:
     def __init__(self, auth_url="https://auth.konan.ai", api_url="https://api.konan.ai", verbose=False):
@@ -26,7 +26,6 @@ class KonanSDK:
         self.auth = KonanAuth(email=email, password=password, auth_url=self.auth_url)
         self.auth.login()
 
-
     def predict(self, deployment_uuid: str, input_data: Union[Dict, str]) -> Tuple[str, Dict]:
         """Call the predict function for a given deployment
 
@@ -43,7 +42,3 @@ class KonanSDK:
         prediction_uuid, output = PredictionEndpoint(api_url=self.api_url, user=self.auth.user, deployment_uuid=deployment_uuid).post(payload=input_data)
 
         return prediction_uuid, output
-
-
-
-

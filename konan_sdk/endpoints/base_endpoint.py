@@ -1,8 +1,8 @@
-from abc import abstractmethod
 import json
 import requests
 from loguru import logger
 from typing import Dict, Union
+from abc import abstractmethod
 
 
 class KonanBaseEndpoint:
@@ -10,8 +10,9 @@ class KonanBaseEndpoint:
     Base Endpoint class for Konan endpoints to inherit.
     """
 
-    name = '' # endpoint name to reference in logs
-    def __init__(self, api_url:str, user) -> None:
+    name = ''  # endpoint name to reference in logs
+
+    def __init__(self, api_url: str, user) -> None:
 
         self.api_url = api_url
         self.user = user
@@ -68,7 +69,6 @@ class KonanBaseEndpoint:
 
         return self.response
 
-
     def get(self, api_url: str):
         """
         Base GET function for all get endpoints
@@ -97,4 +97,3 @@ class KonanBaseEndpoint:
         self.process_response()
 
         return self.response
-

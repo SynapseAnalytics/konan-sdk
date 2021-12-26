@@ -9,7 +9,7 @@ class LoginEndpoint(KonanBaseEndpoint):
 
     @property
     def endpoint_path(self):
-        return  '/api/auth/login/'
+        return '/api/auth/login/'
 
 
 class RefreshTokenEndpoint(KonanBaseEndpoint):
@@ -20,8 +20,7 @@ class RefreshTokenEndpoint(KonanBaseEndpoint):
 
     @property
     def endpoint_path(self):
-        return  '/api/auth/token/refresh/'
-
+        return '/api/auth/token/refresh/'
 
 
 class PredictionEndpoint(KonanBaseEndpoint):
@@ -40,11 +39,6 @@ class PredictionEndpoint(KonanBaseEndpoint):
     def endpoint_path(self):
         return f"/deployments/{self.deployment_uuid}/predict/"
 
-
     def process_response(self):
-
         prediction_uuid = self.response.pop('prediction_uuid')
         self.response = prediction_uuid, self.response
-
-
-
