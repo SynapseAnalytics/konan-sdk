@@ -6,13 +6,19 @@ from typing import Dict, Union
 
 
 class KonanBaseEndpoint:
-    name = ''
+    """
+    Base Endpoint class for Konan endpoints to inherit.
+    """
+
+    name = '' # endpoint name to reference in logs
     def __init__(self, api_url:str, user) -> None:
 
         self.api_url = api_url
         self.user = user
 
+        # request headers
         self.headers = {}
+        # response object
         self.response = {}
 
     @property
@@ -22,16 +28,21 @@ class KonanBaseEndpoint:
     @property
     @abstractmethod
     def endpoint_path(self):
+        # Override method to return path of specified endpoint
         pass
 
     def prepare_request(self):
+        # Override method with logic to implement before sending request
         pass
 
     def process_response(self):
+        # Override method with logic to implement after receiving response
         pass
 
     def post(self, payload: Union[Dict, str]):
-
+        """
+        Base POST function for all post endpoints
+        """
         self.prepare_request()
 
         # If request content type is json, convert input dict to json string
@@ -59,7 +70,9 @@ class KonanBaseEndpoint:
 
 
     def get(self, api_url: str):
-
+        """
+        Base GET function for all get endpoints
+        """
         self.prepare_request()
 
         logger.debug(f"Sending {self.name} request")
