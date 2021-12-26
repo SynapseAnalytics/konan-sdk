@@ -5,13 +5,13 @@ from typing import Dict, Union
 
 
 class KonanBaseEndpoint:
-    def __init__(self, api_url:str, name:str, user) -> None:
+    def __init__(self, api_url:str, user) -> None:
 
         self.api_url = api_url
-        self.name = name
         self.user = user
 
         self.request_url = ''
+        self.name = ''
         self.headers = {}
         self.response = {}
 
