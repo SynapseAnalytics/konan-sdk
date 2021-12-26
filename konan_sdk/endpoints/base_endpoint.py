@@ -6,12 +6,12 @@ from typing import Dict, Union
 
 
 class KonanBaseEndpoint:
+    name = ''
     def __init__(self, api_url:str, user) -> None:
 
         self.api_url = api_url
         self.user = user
 
-        self.name = ''
         self.headers = {}
         self.response = {}
 
