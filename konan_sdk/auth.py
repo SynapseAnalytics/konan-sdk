@@ -45,7 +45,7 @@ class KonanAuth:
         if not self.user.is_access_valid():
             if self.user.is_refresh_valid():
                 logger.debug(f"Access token has expired. Refreshing.")
-                self.auth.refresh_token()
+                self.refresh_token()
             else:
                 logger.debug(f"Both access and refresh tokens have expired, re-logging in.")
                 self.login(self.email, self.password)
