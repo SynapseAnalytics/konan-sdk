@@ -3,7 +3,6 @@ from loguru import logger
 from typing import Optional
 
 from konan_sdk.konan_user import KonanUser
-from konan_sdk.endpoints.utils import LOGIN_ENDPOINT, TOKEN_REFRESH_ENDPOINT
 from konan_sdk.endpoints.konan_endpoints import LoginEndpoint, RefreshTokenEndpoint
 
 

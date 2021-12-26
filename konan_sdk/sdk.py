@@ -14,21 +14,17 @@ class KonanSDK:
         self.auth_url = auth_url
         self.api_url = api_url
 
-        self.email = ''
-        self.password = ''
-
-        self.user: Optional[KonanUser] = None
         self.auth: Optional[KonanAuth] = None
 
         if not verbose:
             logger.remove()
             logger.add(sys.stderr, level="INFO")
 
-    def login(self, email: str, password: str) -> KonanUser:
+    def login(self, email: str, password: str) -> None:
 
         self.auth = KonanAuth(email=email, password=password, auth_url=self.auth_url)
-        self.user = self.auth.login()
-        return self.user
+        self.auth.login()
+
 
     def predict(self, deployment_uuid: str, input_data: Union[Dict, str]) -> Tuple[str, Dict]:
 
@@ -38,7 +34,7 @@ class KonanSDK:
         # Check if access token is valid and retrieve a new one if needed
         self.auth.auto_refresh_token()
 
-        prediction_uuid, output = PredictionEndpoint(api_url=self.api_url, user=self.user, deployment_uuid=deployment_uuid).post(payload=input_data)
+        prediction_uuid, output = PredictionEndpoint(api_url=self.api_url, user=self.auth.user, deployment_uuid=deployment_uuid).post(payload=input_data)
 
         return prediction_uuid, output
 
