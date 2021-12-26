@@ -1,5 +1,4 @@
 from konan_sdk.endpoints.base_endpoint import KonanBaseEndpoint
-from konan_sdk.endpoints.utils import get_predict_endpoint, LOGIN_ENDPOINT, TOKEN_REFRESH_ENDPOINT
 
 
 class LoginEndpoint(KonanBaseEndpoint):
@@ -18,7 +17,7 @@ class RefreshTokenEndpoint(KonanBaseEndpoint):
 
 class PredictionEndpoint(KonanBaseEndpoint):
 
-    def __init__(self, api_url, deployment_uuid, user) -> None:
+    def __init__(self, deployment_uuid, api_url, user) -> None:
         super().__init__( api_url=api_url, user=user)
 
         self.name = 'predict'
