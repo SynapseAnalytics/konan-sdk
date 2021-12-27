@@ -4,9 +4,6 @@ from konan_sdk.endpoints.base_endpoint import KonanBaseEndpoint
 class LoginEndpoint(KonanBaseEndpoint):
     name = 'login'
 
-    def __init__(self, api_url, user) -> None:
-        super().__init__(api_url=api_url, user=user)
-
     @property
     def endpoint_path(self):
         return '/api/auth/login/'
@@ -14,9 +11,6 @@ class LoginEndpoint(KonanBaseEndpoint):
 
 class RefreshTokenEndpoint(KonanBaseEndpoint):
     name = 'refresh_token'
-
-    def __init__(self, api_url, user) -> None:
-        super().__init__(api_url=api_url, user=user)
 
     @property
     def endpoint_path(self):
