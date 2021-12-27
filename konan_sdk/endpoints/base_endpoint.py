@@ -90,8 +90,6 @@ class KonanBaseEndpoint:
 
         logger.debug(f"Received response from {self.name}, parsing output")
 
-        response.raise_for_status()
-
         self.response = response.json()
 
         self.process_response()
