@@ -20,7 +20,10 @@ class RefreshTokenEndpoint(KonanBaseEndpoint):
 class PredictionEndpoint(KonanBaseEndpoint):
     name = 'predict'
 
-    def __init__(self, deployment_uuid, api_url, user) -> None:
+    def __init__(self, api_url, user, deployment_uuid=None, **kwargs) -> None:
+
+        if deployment_uuid is None:
+            raise ValueError("A valid deployment_uuid must be specified")
         super().__init__(api_url=api_url, user=user)
 
         self.deployment_uuid = deployment_uuid

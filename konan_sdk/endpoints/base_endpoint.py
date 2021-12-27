@@ -12,7 +12,7 @@ class KonanBaseEndpoint:
 
     name = ''  # endpoint name to reference in logs
 
-    def __init__(self, api_url: str, user) -> None:
+    def __init__(self, api_url: str, user, **kwargs) -> None:
 
         self.api_url = api_url
         self.user = user
