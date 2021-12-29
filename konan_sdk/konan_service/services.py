@@ -42,7 +42,9 @@ class KonanService():
         feedback_target_class = feedback_target_class or predict_response_class
 
         class ServiceFeedback(KonanServiceBaseFeedback):
+            prediction: predict_response_class
             target: feedback_target_class
+
         class ServiceEvaluateRequest(KonanServiceBaseEvaluateRequest):
             data: List[ServiceFeedback]
 
