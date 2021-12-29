@@ -78,7 +78,7 @@ class KonanBaseEndpoint:
         logger.debug(f"Sending {self.name} request")
 
         # send request
-        response = requests.post(
+        response = requests.get(
             api_url,
             headers={
                 'Authorization': f"Bearer {self.user.access_token}",
