@@ -14,11 +14,12 @@ class KonanAuth:
         self.password = password
         self.user: Optional[KonanUser] = None
 
-
     def login(self) -> KonanUser:
 
-        payload =  { 'email': self.email,
-                    'password': self.password}
+        payload = {
+            'email': self.email,
+            'password': self.password
+        }
 
         response = LoginEndpoint(api_url=self.auth_url, user=self.user).post(payload=payload)
 
@@ -33,7 +34,7 @@ class KonanAuth:
 
     def refresh_token(self) -> None:
         self._post_login_checks()
-        payload = { "refresh": self.user.refresh_token }
+        payload = {"refresh": self.user.refresh_token}
 
         response = RefreshTokenEndpoint(api_url=self.auth_url, user=self.user).post(payload=payload)
 
@@ -44,8 +45,8 @@ class KonanAuth:
         # Check if access token is valid and retrieve a new one if needed
         if not self.user.is_access_valid():
             if self.user.is_refresh_valid():
-                logger.debug(f"Access token has expired. Refreshing.")
+                logger.debug("Access token has expired. Refreshing.")
                 self.refresh_token()
             else:
-                logger.debug(f"Both access and refresh tokens have expired, re-logging in.")
+                logger.debug("Both access and refresh tokens have expired, re-logging in.")
                 self.login()

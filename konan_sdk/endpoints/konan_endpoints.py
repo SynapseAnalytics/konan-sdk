@@ -39,9 +39,9 @@ class PredictionEndpoint(KonanBaseEndpoint):
     @property
     def headers(self):
         return {
-                    'Authorization': f"Bearer {self.user.access_token}",
-                    'Content-Type': 'application/json',
-                }
+            'Authorization': f"Bearer {self.user.access_token}",
+            'Content-Type': 'application/json',
+        }
 
     @property
     def endpoint_path(self):
