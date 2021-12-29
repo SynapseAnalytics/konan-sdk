@@ -3,7 +3,8 @@ from typing import Callable, Type
 from fastapi.types import DecoratedCallable
 from fastapi_utils.inferring_router import InferringRouter
 
-from konan_sdk.konan_service.serializers import (KonanServiceBasePredictionResponse)
+from konan_sdk.konan_service.serializers import (
+    KonanServiceBasePredictionResponse, KonanServiceBaseEvaluateResponse)
 
 
 class KonanServiceRouter(InferringRouter):
@@ -11,10 +12,12 @@ class KonanServiceRouter(InferringRouter):
         self,
         *,
         predict_response_class: Type = KonanServiceBasePredictionResponse,
+        evaluate_response_class: Type = KonanServiceBaseEvaluateResponse,
         **kwargs,
     ) -> None:
-        self._predict_response_class = predict_response_class
         super().__init__(**kwargs)
+        self._predict_response_class = predict_response_class
+        self._evaluate_response_class = evaluate_response_class
 
     def healthz(
         self,
@@ -32,5 +35,15 @@ class KonanServiceRouter(InferringRouter):
         return self.post(
             '/predict',
             response_model=self._predict_response_class,
+            **kwargs,
+        )
+
+    def evaluate(
+        self,
+        **kwargs,
+    ) -> Callable[[DecoratedCallable], DecoratedCallable]:
+        return self.post(
+            '/evaluate',
+            response_model=self._evaluate_response_class,
             **kwargs,
         )

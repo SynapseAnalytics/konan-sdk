@@ -1,7 +1,9 @@
 import abc
 
 from konan_sdk.konan_service.serializers import (
-    KonanServiceBasePredictionRequest, KonanServiceBasePredictionResponse)
+    KonanServiceBasePredictionRequest, KonanServiceBasePredictionResponse,
+    KonanServiceBaseEvaluateRequest, KonanServiceBaseEvaluateResponse,
+)
 
 
 class KonanServiceBaseModel(abc.ABC):
@@ -14,6 +16,19 @@ class KonanServiceBaseModel(abc.ABC):
 
         Returns:
             PredictionResponseClass: prediction.
+            This will be the response returned by the API.
+        """
+        pass
+
+    @abc.abstractmethod
+    def evaluate(self, req: KonanServiceBaseEvaluateRequest) -> KonanServiceBaseEvaluateResponse:
+        """Evaluates the model using past predictions and their feedback
+
+        Args:
+            req (KonanServiceBaseEvaluateRequest): raw request data from API
+
+        Returns:
+            KonanServiceBaseEvaluateResponse: evaluation.
             This will be the response returned by the API.
         """
         pass
