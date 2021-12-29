@@ -43,7 +43,7 @@ class KonanUser:
 
     def set_refresh_token(self, refresh_token: str) -> None:
         self.refresh_token = refresh_token
-        
+
         refresh_token_payload = jwt.decode(refresh_token, options={"verify_signature": False})
 
         self.refresh_exp = refresh_token_payload['exp']
