@@ -12,19 +12,23 @@ class KonanBaseEndpoint:
 
     name = ''  # endpoint name to reference in logs
 
-    def __init__(self, api_url: str, user, **kwargs) -> None:
+    def __init__(self, api_url: str, user=None, **kwargs) -> None:
 
         self.api_url = api_url
         self.user = user
 
-        # request headers
-        self.headers = {}
         # response object
         self.response = {}
 
     @property
     def request_url(self):
         return self.api_url + self.endpoint_path
+
+    @property
+    @abstractmethod
+    def headers(self):
+        # Override to return request headers
+        pass
 
     @property
     @abstractmethod
@@ -80,10 +84,7 @@ class KonanBaseEndpoint:
         # send request
         response = requests.get(
             api_url,
-            headers={
-                'Authorization': f"Bearer {self.user.access_token}",
-                'Content-Type': 'application/json',
-            }
+            headers=self.headers
         )
 
         response.raise_for_status()

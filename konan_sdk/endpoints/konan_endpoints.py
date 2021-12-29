@@ -8,6 +8,10 @@ class LoginEndpoint(KonanBaseEndpoint):
     def endpoint_path(self):
         return '/api/auth/login/'
 
+    @property
+    def headers(self):
+        return {}
+
 
 class RefreshTokenEndpoint(KonanBaseEndpoint):
     name = 'refresh_token'
@@ -15,6 +19,10 @@ class RefreshTokenEndpoint(KonanBaseEndpoint):
     @property
     def endpoint_path(self):
         return '/api/auth/token/refresh/'
+
+    @property
+    def headers(self):
+        return {}
 
 
 class PredictionEndpoint(KonanBaseEndpoint):
@@ -27,10 +35,13 @@ class PredictionEndpoint(KonanBaseEndpoint):
         super().__init__(api_url=api_url, user=user)
 
         self.deployment_uuid = deployment_uuid
-        self.headers = {
-                'Authorization': f"Bearer {self.user.access_token}",
-                'Content-Type': 'application/json',
-            }
+
+    @property
+    def headers(self):
+        return {
+                    'Authorization': f"Bearer {self.user.access_token}",
+                    'Content-Type': 'application/json',
+                }
 
     @property
     def endpoint_path(self):
