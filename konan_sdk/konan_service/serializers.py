@@ -32,7 +32,8 @@ class KonanServiceBaseEvaluateRequest(BaseModel):
     data: List[KonanServiceBaseFeedback]
 
 
-class KonanServicePredefinedMetric(str, Enum):
+class KonanServicePredefinedMetricName(str, Enum):
+    multi_label_confusion_matrix = 'multi_label_confusion_matrix'
     confusion_matrix = 'confusion_matrix'
     precision = 'precision'
     recall = 'recall'
@@ -42,7 +43,7 @@ class KonanServicePredefinedMetric(str, Enum):
 
 
 class KonanServiceEvaluation(BaseModel):
-    metric_name: Union[KonanServicePredefinedMetric, str]
+    metric_name: Union[KonanServicePredefinedMetricName, str]
     metric_value: Any
 
     class Config:
