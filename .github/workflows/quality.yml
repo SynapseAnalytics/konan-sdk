@@ -1,7 +1,9 @@
-name: CI
+name: quality
 on:
   push:
-    branches: [ main ]
+    branches:
+    - "*"
+    - "!main"
   
 jobs:
   Quality:
@@ -32,26 +34,3 @@ jobs:
     # - name: Test with pytest
     #   run: |
     #     python -m poetry run python -m pytest -v tests
-  
-  Release:
-    needs: Quality
-    # https://github.community/t/how-do-i-specify-job-dependency-running-in-another-workflow/16482
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master' && !contains(github.event.head_commit.message, 'chore(release):')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.7
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Semantic Release
-        run: |
-          pip install python-semantic-release
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          semantic-release publish
-        env:
-          GH_TOKEN: ${{ secrets.KONAN_SDK_GITHUB_TOKEN }}
-          PyPI_TOKEN: ${{ secrets.PyPI_TOKEN }}
