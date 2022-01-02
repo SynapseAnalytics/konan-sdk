@@ -1,9 +1,9 @@
 import sys
 from loguru import logger
-from typing import Optional, Dict, Union, Tuple
+from typing import Optional, Dict, Union, Tuple, List
 
 from konan_sdk.auth import KonanAuth
-from konan_sdk.endpoints.konan_endpoints import PredictionEndpoint
+from konan_sdk.endpoints.konan_endpoints import FeedbackEndpoint, PredictionEndpoint
 
 
 class KonanSDK:
@@ -42,3 +42,14 @@ class KonanSDK:
         prediction_uuid, output = PredictionEndpoint(api_url=self.api_url, user=self.auth.user, deployment_uuid=deployment_uuid).post(payload=input_data)
 
         return prediction_uuid, output
+
+    def feedback(self, deployment_uuid: str, feedback: List[Dict]):
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        response = FeedbackEndpoint(api_url=self.api_url, user=self.auth.user, deployment_uuid=deployment_uuid).post(payload=feedback)
+
+        return response
