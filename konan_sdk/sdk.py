@@ -1,9 +1,10 @@
+import datetime
 import sys
 from loguru import logger
 from typing import Optional, Dict, Union, Tuple
 
 from konan_sdk.auth import KonanAuth
-from konan_sdk.endpoints.konan_endpoints import PredictionEndpoint
+from konan_sdk.endpoints.konan_endpoints import EvaluateEndpoint, PredictionEndpoint
 
 
 class KonanSDK:
@@ -42,3 +43,26 @@ class KonanSDK:
         prediction_uuid, output = PredictionEndpoint(api_url=self.api_url, user=self.auth.user, deployment_uuid=deployment_uuid).post(payload=input_data)
 
         return prediction_uuid, output
+
+    def evalute(self, deployment_uuid: str, start_time: datetime.datetime, end_time: datetime.datetime) -> Dict:
+        """Call the evaluate function for a given deployment
+
+        Args:
+            deployment_uuid (str):  uuid of deployment to use for prediction
+            start_time (datetime.datetime): starting date-time of past predictions to use to evaluate
+            end_time (datetime.datetime): ending date-time of past predictions to use to evaluate
+
+        Returns:
+            Dict: [description]
+        """
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        response = EvaluateEndpoint(
+            api_url=self.ap, user=self.auth.user, deployment_uuid=deployment_uuid
+        ).post(payload={'start_time': start_time.isoformat(), 'end_time': end_time.isoformat()})
+
+        return response
