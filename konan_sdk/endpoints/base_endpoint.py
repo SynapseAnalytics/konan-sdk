@@ -123,7 +123,7 @@ class KonanBaseEndpoint(ABC):
 
 class KonanBaseAuthenticatedEndpoint(KonanBaseEndpoint):
     def __init__(self, api_url: str, user: KonanUser = None, **kwargs) -> None:
-        super().__init__(api_url, user=user, **kwargs)
+        super().__init__(api_url, **kwargs)
         if user is None:
             raise ValueError("A valid user must be specified")
         self.user = user
