@@ -44,16 +44,17 @@ class KonanSDK:
 
         return prediction_uuid, output
 
-    def evalute(self, deployment_uuid: str, start_time: datetime.datetime, end_time: datetime.datetime) -> Dict:
+    def evalute(self, deployment_uuid: str, start_time: datetime.datetime, end_time: datetime.datetime) -> Dict:     
         """Call the evaluate function for a given deployment
 
-        Args:
-            deployment_uuid (str):  uuid of deployment to use for prediction
-            start_time (datetime.datetime): starting date-time of past predictions to use to evaluate
-            end_time (datetime.datetime): ending date-time of past predictions to use to evaluate
-
-        Returns:
-            Dict: [description]
+        :param deployment_uuid: uuid of deployment to use for prediction
+        :type deployment_uuid: str
+        :param start_time: starting date-time of past predictions to use to evaluate
+        :type start_time: datetime.datetime
+        :param end_time: ending date-time of past predictions to use to evaluate
+        :type end_time: datetime.datetime
+        :return: dict containing evaluate result
+        :rtype: Dict
         """
         # check user performed login
         self.auth._post_login_checks()
