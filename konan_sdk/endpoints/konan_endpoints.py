@@ -1,6 +1,8 @@
-from typing import Any, Dict, Union
+import datetime
+from typing import Any, Dict, List, Union
 from konan_sdk.endpoints.base_endpoint import KonanBaseEndpoint, KonanBaseDeploymentEndpoint
 from konan_sdk.endpoints.interfaces import KonanEndpointRequest, KonanEndpointResponse
+from konan_sdk.konan_types.konan_metrics import KonanBaseMetric, KonanCustomMetric, PredefinedMetrics
 
 
 class LoginEndpoint(KonanBaseEndpoint):
@@ -76,3 +78,43 @@ class PredictionEndpoint(KonanBaseDeploymentEndpoint):
 
     def process_response(self, endpoint_response: KonanEndpointResponse) -> ResponseObject:
         return PredictionEndpoint.ResponseObject(prediction_uuid=endpoint_response.json['prediction_uuid'], output=endpoint_response.json['output'])
+
+
+class EvaluateEndpoint(KonanBaseDeploymentEndpoint):
+    @property
+    def name(self) -> str:
+        return 'evaluate'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/evaluate'
+
+    class RequestObject():
+        def __init__(self, start_time: datetime.datetime, end_time: datetime.datetime) -> None:
+            self.start_time = start_time
+            self.end_time = end_time
+
+    class ResponseObject():
+        def __init___(self, metrics: List[KonanBaseMetric], error: str = None) -> None:
+            self.metrics = metrics
+            self.error = error
+
+    def prepare_request(self, request_object: RequestObject) -> KonanEndpointRequest:
+        return KonanEndpointRequest(data={
+            'start_time': request_object.start_time.isoformat(),
+            'end_time': request_object.end_time.isoformat()
+        })
+
+    def process_response(self, endpoint_response: KonanEndpointResponse) -> ResponseObject:
+        predfined_metrics_dict = endpoint_response.json['metrics'].get("predefined", dict())
+        custom_metrics_list = endpoint_response.json['metrics'].get("custom", list())
+
+        metrics: List[KonanBaseMetric] = [
+            PredefinedMetrics.get(metric_name, KonanCustomMetric)(predfined_metrics_dict[metric_name], name=metric_name)
+            for metric_name in predfined_metrics_dict.keys()
+        ] + [
+            KonanCustomMetric(metric_dict["metric_value"], name=metric_dict["metric_name"])
+            for metric_dict in custom_metrics_list
+        ]
+
+        return EvaluateEndpoint.ResponseObject(metrics, endpoint_response.json.get("error", None))
