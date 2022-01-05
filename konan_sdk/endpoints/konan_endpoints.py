@@ -1,6 +1,7 @@
-from typing import Any, Dict, Union
+from typing import Any, Dict, List, Union
 from konan_sdk.endpoints.base_endpoint import KonanBaseEndpoint, KonanBaseDeploymentEndpoint
 from konan_sdk.endpoints.interfaces import KonanEndpointRequest, KonanEndpointResponse
+from konan_sdk.konan_types.konan_feedback import FeedbackStatus, FeedbackSubmission
 
 
 class LoginEndpoint(KonanBaseEndpoint):
@@ -76,3 +77,45 @@ class PredictionEndpoint(KonanBaseDeploymentEndpoint):
 
     def process_response(self, endpoint_response: KonanEndpointResponse) -> ResponseObject:
         return PredictionEndpoint.ResponseObject(prediction_uuid=endpoint_response.json['prediction_uuid'], output=endpoint_response.json['output'])
+
+
+class FeedbackEndpoint(KonanBaseDeploymentEndpoint):
+    @property
+    def name(self) -> str:
+        return 'feedback'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/predictions/feedback'
+
+    class RequestObject():
+        def __init__(self, feedbacks: List[FeedbackSubmission]) -> None:
+            self.feedbacks = feedbacks
+
+    class ResponseObject():
+        def __init__(self, feedbacks_results: List[FeedbackStatus], failure_num: int, success_num: int, total_num: int) -> None:
+            self.feedbacks_results = feedbacks_results
+            self.failure_num = failure_num
+            self.success_num = success_num
+            self.total_num = total_num
+
+    def prepare_request(self, request_object: RequestObject) -> KonanEndpointRequest:
+        return KonanEndpointRequest(
+            data={
+                "feedback": [
+                    {
+                        "prediction_uuid": feedback.prediction_uuid,
+                        "target": feedback.target,
+                    } for feedback in request_object.feedbacks
+                ]
+            }
+        )
+
+    def process_response(self, endpoint_response: KonanEndpointResponse) -> ResponseObject:
+        return FeedbackEndpoint.ResponseObject(
+            [
+                FeedbackStatus(
+                    feedback_result['prediction_uuid'], feedback_result['status'], feedback_result['message']
+                ) for feedback_result in endpoint_response.json["data"]
+            ], endpoint_response.json["failure"], endpoint_response.json["success"], endpoint_response.json["total"]
+        )

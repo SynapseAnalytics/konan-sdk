@@ -1,9 +1,10 @@
 import sys
 from loguru import logger
-from typing import Optional, Dict, Union, Tuple
+from typing import List, Optional, Dict, Union, Tuple
 
 from konan_sdk.auth import KonanAuth
-from konan_sdk.endpoints.konan_endpoints import PredictionEndpoint
+from konan_sdk.endpoints.konan_endpoints import FeedbackEndpoint, PredictionEndpoint
+from konan_sdk.konan_types.konan_feedback import FeedbackSubmission
 
 
 class KonanSDK:
@@ -44,3 +45,28 @@ class KonanSDK:
         ).post(PredictionEndpoint.RequestObject(input_data=input_data))
 
         return response.prediction_uuid, response.output
+
+    def feedback(
+        self, deployment_uuid: str,
+        feedbacks: List[FeedbackSubmission]
+    ) -> FeedbackEndpoint.ResponseObject:
+        """Call the feedback function for a given deployment
+
+        :param deployment_uuid: uuid of deployment to use for prediction
+        :type deployment_uuid: str
+        :param feedbacks: feedback objects to register with the deployment
+        :type feedbacks: List[FeedbackEndpoint.RequestObject.SingleFeedbackRequestObject]
+        :return: feedback result
+        :rtype: FeedbackEndpoint.ResponseObject
+        """
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        response: FeedbackEndpoint.ResponseObject = FeedbackEndpoint(
+            api_url=self.api_url, deployment_uuid=deployment_uuid, user=self.auth.user
+        ).post(FeedbackEndpoint.RequestObject(feedbacks))
+
+        return response
