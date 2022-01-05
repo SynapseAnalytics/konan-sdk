@@ -39,6 +39,8 @@ class KonanSDK:
         # Check if access token is valid and retrieve a new one if needed
         self.auth.auto_refresh_token()
 
-        prediction_uuid, output = PredictionEndpoint(api_url=self.api_url, user=self.auth.user, deployment_uuid=deployment_uuid).post(payload=input_data)
+        response: PredictionEndpoint.ResponseObject = PredictionEndpoint(
+            api_url=self.api_url, user=self.auth.user, deployment_uuid=deployment_uuid
+        ).post(PredictionEndpoint.RequestObject(input_data=input_data))
 
-        return prediction_uuid, output
+        return response.prediction_uuid, response.output
