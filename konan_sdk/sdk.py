@@ -55,7 +55,7 @@ class KonanSDK:
     def feedback(
         self, deployment_uuid: str,
         feedbacks: List[KonanFeedbackSubmission]
-    ) -> KonanFeedbacksResult:    
+    ) -> KonanFeedbacksResult:
         """Call the feedback function for a given deployment
 
         :param deployment_uuid: uuid of deployment to use for prediction
