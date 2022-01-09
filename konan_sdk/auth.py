@@ -1,9 +1,12 @@
 
 from loguru import logger
 from typing import Optional
+from konan_sdk.konan_types import KonanCredentials
 
 from konan_sdk.konan_user import KonanUser
-from konan_sdk.endpoints.konan_endpoints import LoginEndpoint, RefreshTokenEndpoint
+from konan_sdk.endpoints.konan_endpoints import (
+    LoginEndpoint, RefreshTokenEndpoint
+)
 
 
 class KonanAuth:
@@ -14,13 +17,13 @@ class KonanAuth:
         self.user: Optional[KonanUser] = None
 
     def login(self) -> KonanUser:
-        response: LoginEndpoint.ResponseObject = LoginEndpoint(
-            api_url=self.auth_url, user=self.user
-        ).post(LoginEndpoint.RequestObject(self.email, self.password))
+        response = LoginEndpoint(self.auth_url).post(
+            KonanCredentials(self.email, self.password)
+        )
 
         logger.info(f"Successfully logged in using {self.email}")
 
-        self.user = KonanUser(response.access_token, response.refresh_token)
+        self.user = KonanUser(response.access, response.refresh)
         return self.user
 
     def _post_login_checks(self) -> None:
@@ -29,10 +32,10 @@ class KonanAuth:
     def refresh_token(self) -> None:
         self._post_login_checks()
 
-        response: RefreshTokenEndpoint.ResponseObject = RefreshTokenEndpoint(
-            api_url=self.auth_url, user=self.user
-        ).post(RefreshTokenEndpoint.RequestObject(refresh_token=self.user.refresh_token))
-        self.user.set_access_token(response.access_token)
+        new_access_token = RefreshTokenEndpoint(self.auth_url).post(
+            self.user.refresh_token
+        )
+        self.user.set_access_token(new_access_token)
 
     def auto_refresh_token(self) -> None:
 

@@ -1,13 +1,18 @@
 import requests
 from loguru import logger
-from typing import Any, Dict, Optional
-from abc import ABC, abstractmethod
+from typing import Dict, Generic, Optional, TypeVar
+from abc import abstractmethod
 
 from konan_sdk.konan_user import KonanUser
-from konan_sdk.endpoints.interfaces import KonanEndpointRequest, KonanEndpointResponse
+from konan_sdk.endpoints.interfaces import (
+    KonanEndpointRequest, KonanEndpointResponse
+)
+
+ReqT = TypeVar('ReqT')
+ResT = TypeVar('ResT')
 
 
-class KonanBaseEndpoint(ABC):
+class KonanBaseEndpoint(Generic[ReqT, ResT]):
     """
     Base Endpoint class for Konan endpoints to inherit.
     """
@@ -56,19 +61,21 @@ class KonanBaseEndpoint(ABC):
         Returns:
             Optional[Dict]: request headers
         """
-        return None
+        return {
+            'Content-Type': 'application/json',
+        }
 
     @abstractmethod
-    def prepare_request(self, request_object: Any) -> KonanEndpointRequest:
+    def prepare_request(self, request_object: ReqT) -> KonanEndpointRequest:
         # Override method with logic to implement before sending request
         return None
 
     @abstractmethod
-    def process_response(self, endpoint_response: KonanEndpointResponse) -> Any:
+    def process_response(self, endpoint_response: KonanEndpointResponse) -> ResT:
         # Override method with logic to implement after receiving response
         return None
 
-    def post(self, request_object: Any) -> Any:
+    def post(self, request_object: ReqT) -> ResT:
         """
         Base POST method for all get endpoints
         """
@@ -82,11 +89,13 @@ class KonanBaseEndpoint(ABC):
 
         response.raise_for_status()
 
-        endpoint_response = KonanEndpointResponse(status_code=response.status_code, json=response.json())
+        endpoint_response = KonanEndpointResponse(
+            status_code=response.status_code, json=response.json()
+        )
         response_object = self.process_response(endpoint_response)
         return response_object
 
-    def get(self, request_object: Any) -> Any:
+    def get(self, request_object: ReqT) -> ResT:
         """
         Base GET method for all get endpoints
         """
@@ -100,12 +109,14 @@ class KonanBaseEndpoint(ABC):
 
         response.raise_for_status()
 
-        endpoint_response = KonanEndpointResponse(status_code=response.status_code, json=response.json())
+        endpoint_response = KonanEndpointResponse(
+            status_code=response.status_code, json=response.json()
+        )
         response_object = self.process_response(endpoint_response)
         return response_object
 
 
-class KonanBaseAuthenticatedEndpoint(KonanBaseEndpoint):
+class KonanBaseAuthenticatedEndpoint(KonanBaseEndpoint[ReqT, ResT]):
     def __init__(self, api_url: str, user: KonanUser = None, **kwargs) -> None:
         super().__init__(api_url, **kwargs)
         if user is None:
@@ -115,13 +126,18 @@ class KonanBaseAuthenticatedEndpoint(KonanBaseEndpoint):
     @property
     def headers(self) -> Dict:
         return {
-            'Authorization': f"Bearer {self.user.access_token}",
-            'Content-Type': 'application/json',
+            **(super().headers or dict()),
+            **{
+                'Authorization': f"Bearer {self.user.access_token}",
+            }
         }
 
 
-class KonanBaseDeploymentEndpoint(KonanBaseAuthenticatedEndpoint):
-    def __init__(self, api_url: str, deployment_uuid: str = None, user: KonanUser = None, **kwargs) -> None:
+class KonanBaseDeploymentEndpoint(KonanBaseAuthenticatedEndpoint[ReqT, ResT]):
+    def __init__(
+        self, api_url: str,
+        deployment_uuid: str = None, user: KonanUser = None, **kwargs
+    ) -> None:
         super().__init__(api_url, user=user, **kwargs)
         if deployment_uuid is None:
             raise ValueError("A valid deployment_uuid must be specified")

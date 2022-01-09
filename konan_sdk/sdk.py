@@ -7,7 +7,10 @@ from konan_sdk.endpoints.konan_endpoints import PredictionEndpoint
 
 
 class KonanSDK:
-    def __init__(self, auth_url="https://auth.konan.ai", api_url="https://api.konan.ai", verbose=False):
+    def __init__(
+        self, auth_url="https://auth.konan.ai", api_url="https://api.konan.ai",
+        verbose=False
+    ):
         self.auth_url = auth_url
         self.api_url = api_url
 
@@ -23,10 +26,13 @@ class KonanSDK:
         :param email: email of registered user
         :param password: password of registered user
         """
-        self.auth = KonanAuth(email=email, password=password, auth_url=self.auth_url)
+        self.auth = KonanAuth(self.auth_url, email, password)
         self.auth.login()
 
-    def predict(self, deployment_uuid: str, input_data: Union[Dict, str]) -> Tuple[str, Dict]:
+    def predict(
+        self,
+        deployment_uuid: str, input_data: Union[Dict, str]
+    ) -> Tuple[str, Dict]:
         """Call the predict function for a given deployment
 
         :param deployment_uuid: uuid of deployment to use for prediction
@@ -39,8 +45,8 @@ class KonanSDK:
         # Check if access token is valid and retrieve a new one if needed
         self.auth.auto_refresh_token()
 
-        response: PredictionEndpoint.ResponseObject = PredictionEndpoint(
-            api_url=self.api_url, user=self.auth.user, deployment_uuid=deployment_uuid
-        ).post(PredictionEndpoint.RequestObject(input_data=input_data))
-
-        return response.prediction_uuid, response.output
+        prediction = PredictionEndpoint(
+            self.api_url,
+            deployment_uuid=deployment_uuid, user=self.auth.user
+        ).post(input_data)
+        return prediction.uuid, prediction.output
