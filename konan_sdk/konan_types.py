@@ -31,6 +31,7 @@ class KonanFeedbackStatus():
         self.status = status
         self.message = message
 
+
 class KonanFeedbacksResult():
     def __init__(
         self, feedbacks_status: List[KonanFeedbackStatus],

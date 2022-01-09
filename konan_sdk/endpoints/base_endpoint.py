@@ -48,9 +48,10 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
         :rtype: str
         """
         return None
+
     @property
     def request_url(self) -> str:
-        """Returns the full API URL 
+        """Returns the full API URL
 
         :return: URL-formatted string for endpoint
         :rtype: str
