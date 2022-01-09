@@ -55,15 +55,15 @@ class KonanSDK:
     def feedback(
         self, deployment_uuid: str,
         feedbacks: List[KonanFeedbackSubmission]
-    ) -> KonanFeedbacksResult:
+    ) -> KonanFeedbacksResult:    
         """Call the feedback function for a given deployment
 
         :param deployment_uuid: uuid of deployment to use for prediction
         :type deployment_uuid: str
         :param feedbacks: feedback objects to register with the deployment
-        :type feedbacks: List[FeedbackEndpoint.RequestObject.SingleFeedbackRequestObject]
+        :type feedbacks: List[KonanFeedbackSubmission]
         :return: feedback result
-        :rtype: FeedbackEndpoint.ResponseObject
+        :rtype: KonanFeedbacksResult
         """
         # check user performed login
         self.auth._post_login_checks()
