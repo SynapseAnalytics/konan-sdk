@@ -4,11 +4,14 @@ from typing import List, Optional, Dict, Union, Tuple
 
 from konan_sdk.auth import KonanAuth
 from konan_sdk.endpoints.konan_endpoints import FeedbackEndpoint, PredictionEndpoint
-from konan_sdk.konan_types.konan_feedback import FeedbackSubmission
+from konan_sdk.konan_types import KonanFeedbackSubmission, KonanFeedbacksResult
 
 
 class KonanSDK:
-    def __init__(self, auth_url="https://auth.konan.ai", api_url="https://api.konan.ai", verbose=False):
+    def __init__(
+        self, auth_url="https://auth.konan.ai", api_url="https://api.konan.ai",
+        verbose=False
+    ):
         self.auth_url = auth_url
         self.api_url = api_url
 
@@ -24,10 +27,13 @@ class KonanSDK:
         :param email: email of registered user
         :param password: password of registered user
         """
-        self.auth = KonanAuth(email=email, password=password, auth_url=self.auth_url)
+        self.auth = KonanAuth(self.auth_url, email, password)
         self.auth.login()
 
-    def predict(self, deployment_uuid: str, input_data: Union[Dict, str]) -> Tuple[str, Dict]:
+    def predict(
+        self,
+        deployment_uuid: str, input_data: Union[Dict, str]
+    ) -> Tuple[str, Dict]:
         """Call the predict function for a given deployment
 
         :param deployment_uuid: uuid of deployment to use for prediction
@@ -40,16 +46,16 @@ class KonanSDK:
         # Check if access token is valid and retrieve a new one if needed
         self.auth.auto_refresh_token()
 
-        response: PredictionEndpoint.ResponseObject = PredictionEndpoint(
-            api_url=self.api_url, user=self.auth.user, deployment_uuid=deployment_uuid
-        ).post(PredictionEndpoint.RequestObject(input_data=input_data))
-
-        return response.prediction_uuid, response.output
+        prediction = PredictionEndpoint(
+            self.api_url,
+            deployment_uuid=deployment_uuid, user=self.auth.user
+        ).post(input_data)
+        return prediction.uuid, prediction.output
 
     def feedback(
         self, deployment_uuid: str,
-        feedbacks: List[FeedbackSubmission]
-    ) -> FeedbackEndpoint.ResponseObject:
+        feedbacks: List[KonanFeedbackSubmission]
+    ) -> KonanFeedbacksResult:
         """Call the feedback function for a given deployment
 
         :param deployment_uuid: uuid of deployment to use for prediction
@@ -65,8 +71,8 @@ class KonanSDK:
         # Check if access token is valid and retrieve a new one if needed
         self.auth.auto_refresh_token()
 
-        response: FeedbackEndpoint.ResponseObject = FeedbackEndpoint(
-            api_url=self.api_url, deployment_uuid=deployment_uuid, user=self.auth.user
-        ).post(FeedbackEndpoint.RequestObject(feedbacks))
-
-        return response
+        feedbacks_result = FeedbackEndpoint(
+            self.api_url,
+            deployment_uuid=deployment_uuid, user=self.auth.user
+        ).post(feedbacks)
+        return feedbacks_result
