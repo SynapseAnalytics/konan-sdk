@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Dict, Type, Any
 
 
 class KonanBaseMetric(ABC):
@@ -64,8 +64,10 @@ class KonanCustomMetric(KonanBaseMetric):
         self.__metric_name = name
 
 
-PredefinedMetrics = {
-    "rmse": KonanRMSEMetric, "mae": KonanMAEMetric, "precision": KonanPrecisionMetric,
-    "recall": KonanRecallMetric, "f1_score": KonanF1ScoreMetric,
-    "confusion_matrix": KonanConfusionMatrixMetric, "multi_label_confusion_matrix": KonanMultiLabelConfusionMatrixMetric
+KONAN_PREDEFINED_METRICS: Dict[str, Type[KonanBaseMetric]] = {
+    "rmse": KonanRMSEMetric, "mae": KonanMAEMetric,
+    "precision": KonanPrecisionMetric, "recall": KonanRecallMetric,
+    "f1_score": KonanF1ScoreMetric,
+    "confusion_matrix": KonanConfusionMatrixMetric,
+    "multi_label_confusion_matrix": KonanMultiLabelConfusionMatrixMetric
 }

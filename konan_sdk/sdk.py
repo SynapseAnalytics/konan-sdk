@@ -1,14 +1,21 @@
 import datetime
 import sys
 from loguru import logger
-from typing import Optional, Dict, Union, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from konan_sdk.auth import KonanAuth
-from konan_sdk.endpoints.konan_endpoints import EvaluateEndpoint, PredictionEndpoint
+from konan_sdk.endpoints.konan_endpoints import (
+    EvaluateEndpoint, PredictionEndpoint
+)
+from konan_sdk.konan_metrics import KonanBaseMetric
+from konan_sdk.konan_types import KonanTimeWindow
 
 
 class KonanSDK:
-    def __init__(self, auth_url="https://auth.konan.ai", api_url="https://api.konan.ai", verbose=False):
+    def __init__(
+        self, auth_url="https://auth.konan.ai", api_url="https://api.konan.ai",
+        verbose=False
+    ):
         self.auth_url = auth_url
         self.api_url = api_url
 
@@ -24,10 +31,13 @@ class KonanSDK:
         :param email: email of registered user
         :param password: password of registered user
         """
-        self.auth = KonanAuth(email=email, password=password, auth_url=self.auth_url)
+        self.auth = KonanAuth(self.auth_url, email, password)
         self.auth.login()
 
-    def predict(self, deployment_uuid: str, input_data: Union[Dict, str]) -> Tuple[str, Dict]:
+    def predict(
+        self,
+        deployment_uuid: str, input_data: Union[Dict, str]
+    ) -> Tuple[str, Dict]:
         """Call the predict function for a given deployment
 
         :param deployment_uuid: uuid of deployment to use for prediction
@@ -40,16 +50,16 @@ class KonanSDK:
         # Check if access token is valid and retrieve a new one if needed
         self.auth.auto_refresh_token()
 
-        response: PredictionEndpoint.ResponseObject = PredictionEndpoint(
-            api_url=self.api_url, user=self.auth.user, deployment_uuid=deployment_uuid
-        ).post(PredictionEndpoint.RequestObject(input_data=input_data))
-
-        return response.prediction_uuid, response.output
+        prediction = PredictionEndpoint(
+            self.api_url,
+            deployment_uuid=deployment_uuid, user=self.auth.user
+        ).post(input_data)
+        return prediction.uuid, prediction.output
 
     def evaluate(
         self, deployment_uuid: str,
         start_time: datetime.datetime, end_time: datetime.datetime
-    ) -> EvaluateEndpoint.ResponseObject:
+    ) -> List[KonanBaseMetric]:
         """Call the evaluate function for a given deployment
 
         :param deployment_uuid: uuid of deployment to use for evaluation
@@ -68,8 +78,9 @@ class KonanSDK:
         # Check if access token is valid and retrieve a new one if needed
         self.auth.auto_refresh_token()
 
-        response: EvaluateEndpoint.ResponseObject = EvaluateEndpoint(
-            api_url=self.api_url, deployment_uuid=deployment_uuid, user=self.auth.user
-        ).post(EvaluateEndpoint.RequestObject(start_time, end_time))
+        model_metrics = EvaluateEndpoint(
+            self.api_url,
+            deployment_uuid=deployment_uuid, user=self.auth.user
+        ).post(KonanTimeWindow(start_time, end_time))
 
-        return response
+        return model_metrics
