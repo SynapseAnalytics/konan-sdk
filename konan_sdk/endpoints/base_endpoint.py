@@ -13,25 +13,29 @@ ResT = TypeVar('ResT')
 
 
 class KonanBaseEndpoint(Generic[ReqT, ResT]):
-    """
-    Base Endpoint class for Konan endpoints to inherit.
+    """Base Endpoint class for Konan endpoints to inherit.
+
+    :param ReqT: type of request_object to use in .get() and .post() methods
+    :type ReqT: type
+    :param ResT: type of object that .get() and .post() methods return
+    :type ResT: type
     """
 
     def __init__(self, api_url: str, **kwargs) -> None:
         """Initializes a Konan base endpoint
 
-        Args:
-            api_url (str): [description]
+        :param api_url: base URL of Konan API
+        :type api_url: str
         """
         self.api_url = api_url
 
     @property
     @abstractmethod
     def name(self) -> str:
-        """Returns name of endpoint to use in logs
+        """Returns name of endpoint
 
-        Returns:
-            str: name of endpoint
+        :return: endpoint name
+        :rtype: str
         """
         return None
 
@@ -40,17 +44,16 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
     def endpoint_path(self) -> str:
         """Returns endpoint path, relative to self.api_url
 
-        Returns:
-            str: endpoint path
+        :return: endpoint path
+        :rtype: str
         """
         return None
-
     @property
     def request_url(self) -> str:
-        """Returns full URL for API request
+        """Returns the full API URL 
 
-        Returns:
-            [str]: URL-formatted string for endpoint
+        :return: URL-formatted string for endpoint
+        :rtype: str
         """
         return self.api_url + self.endpoint_path
 
@@ -58,8 +61,8 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
     def headers(self) -> Optional[Dict]:
         """Returns request headers to use
 
-        Returns:
-            Optional[Dict]: request headers
+        :return: request headers
+        :rtype: Optional[Dict]
         """
         return {
             'Content-Type': 'application/json',
@@ -76,8 +79,12 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
         return None
 
     def post(self, request_object: ReqT) -> ResT:
-        """
-        Base POST method for all get endpoints
+        """Base POST method for all Konan endpoints
+
+        :param request_object: endpoint request
+        :type request_object: ReqT
+        :return: endpoint response
+        :rtype: ResT
         """
         endpoint_request = self.prepare_request(request_object)
 
@@ -96,8 +103,12 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
         return response_object
 
     def get(self, request_object: ReqT) -> ResT:
-        """
-        Base GET method for all get endpoints
+        """Base GET method for all Konan endpoints
+
+        :param request_object: endpoint request
+        :type request_object: ReqT
+        :return: endpoint response
+        :rtype: ResT
         """
         endpoint_request = self.prepare_request(request_object)
 
@@ -117,7 +128,22 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
 
 
 class KonanBaseAuthenticatedEndpoint(KonanBaseEndpoint[ReqT, ResT]):
+    """Base Endpoint class for Konan endpoints that require authentication.
+
+    :param ReqT: type of request_object to use in .get() and .post() methods
+    :type ReqT: type
+    :param ResT: type of object that .get() and .post() methods return
+    :type ResT: type
+    """
     def __init__(self, api_url: str, user: KonanUser = None, **kwargs) -> None:
+        """Initializes a Konan endpoint that requires authentication
+
+        :param api_url: base URL of Konan API
+        :type api_url: str
+        :param user: user to authenticate as, defaults to None
+        :type user: KonanUser, optional
+        :raises ValueError: raises ValueError when user is not valid
+        """
         super().__init__(api_url, **kwargs)
         if user is None:
             raise ValueError("A valid user must be specified")
@@ -125,6 +151,11 @@ class KonanBaseAuthenticatedEndpoint(KonanBaseEndpoint[ReqT, ResT]):
 
     @property
     def headers(self) -> Dict:
+        """Returns Adds Authorization key to self.headers
+
+        :return: request headers
+        :rtype: Dict
+        """
         return {
             **(super().headers or dict()),
             **{
@@ -134,10 +165,27 @@ class KonanBaseAuthenticatedEndpoint(KonanBaseEndpoint[ReqT, ResT]):
 
 
 class KonanBaseDeploymentEndpoint(KonanBaseAuthenticatedEndpoint[ReqT, ResT]):
+    """Base Endpoint class for Konan endpoints that deal with deployments.
+
+    :param ReqT: type of request_object to use in .get() and .post() methods
+    :type ReqT: type
+    :param ResT: type of object that .get() and .post() methods return
+    :type ResT: type
+    """
     def __init__(
         self, api_url: str,
         deployment_uuid: str = None, user: KonanUser = None, **kwargs
     ) -> None:
+        """Initializes a Konan endpoint that deals with a deployment
+
+        :param api_url: base URL of Konan API
+        :type api_url: str
+        :param deployment_uuid: deployment uuid to use, defaults to None
+        :type deployment_uuid: str
+        :param user: user to authenticate as, defaults to None
+        :type user: KonanUser
+        :raises ValueError: raises ValueError when deployment_uuid is not valid
+        """
         super().__init__(api_url, user=user, **kwargs)
         if deployment_uuid is None:
             raise ValueError("A valid deployment_uuid must be specified")
@@ -145,9 +193,9 @@ class KonanBaseDeploymentEndpoint(KonanBaseAuthenticatedEndpoint[ReqT, ResT]):
 
     @property
     def endpoint_path(self) -> str:
-        """Returns endpoint path, relative to self.api_url
+        """Returns base deployment endpoint path, relative to self.api_url
 
-        Returns:
-            str: endpoint path
+        :return: endpoint path
+        :rtype: str
         """
         return f"/deployments/{self.deployment_uuid}"
