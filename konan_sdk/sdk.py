@@ -5,10 +5,16 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from konan_sdk.auth import KonanAuth
 from konan_sdk.endpoints.konan_endpoints import (
-    EvaluateEndpoint, PredictionEndpoint
+    PredictionEndpoint,
+    EvaluateEndpoint,
+    FeedbackEndpoint,
 )
 from konan_sdk.konan_metrics import KonanBaseMetric
-from konan_sdk.konan_types import KonanTimeWindow
+from konan_sdk.konan_types import (
+    KonanFeedbackSubmission,
+    KonanFeedbacksResult,
+    KonanTimeWindow,
+)
 
 
 class KonanSDK:
@@ -71,7 +77,6 @@ class KonanSDK:
         :return: A model evaluation object
         :rtype: EvaluateEndpoint.ResponseObject
         """
-
         # check user performed login
         self.auth._post_login_checks()
 
@@ -84,3 +89,28 @@ class KonanSDK:
         ).post(KonanTimeWindow(start_time, end_time))
 
         return model_metrics
+
+    def feedback(
+        self, deployment_uuid: str,
+        feedbacks: List[KonanFeedbackSubmission]
+    ) -> KonanFeedbacksResult:
+        """Call the feedback function for a given deployment
+
+        :param deployment_uuid: uuid of deployment to use for prediction
+        :type deployment_uuid: str
+        :param feedbacks: feedback objects to register with the deployment
+        :type feedbacks: List[KonanFeedbackSubmission]
+        :return: feedback result
+        :rtype: KonanFeedbacksResult
+        """
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        feedbacks_result = FeedbackEndpoint(
+            self.api_url,
+            deployment_uuid=deployment_uuid, user=self.auth.user
+        ).post(feedbacks)
+        return feedbacks_result

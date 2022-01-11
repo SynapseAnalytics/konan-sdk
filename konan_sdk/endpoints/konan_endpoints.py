@@ -1,19 +1,24 @@
 from typing import Any, Dict, List, Union
 
 from konan_sdk.endpoints.base_endpoint import (
-    KonanBaseEndpoint, KonanBaseDeploymentEndpoint
+    KonanBaseEndpoint,
+    KonanBaseDeploymentEndpoint,
 )
 from konan_sdk.endpoints.interfaces import (
-    KonanEndpointRequest, KonanEndpointResponse
+    KonanEndpointRequest,
+    KonanEndpointResponse,
 )
 from konan_sdk.konan_metrics import (
-    KonanBaseMetric, KonanCustomMetric,
-    KONAN_PREDEFINED_METRICS
+    KonanBaseMetric,
+    KonanCustomMetric,
+    KONAN_PREDEFINED_METRICS,
 )
 from konan_sdk.konan_types import (
-    KonanCredentials, KonanTokens,
+    KonanCredentials,
+    KonanTokens,
     KonanPrediction,
-    KonanTimeWindow
+    KonanFeedbackSubmission, KonanFeedbackStatus, KonanFeedbacksResult,
+    KonanTimeWindow,
 )
 
 
@@ -126,3 +131,47 @@ class EvaluateEndpoint(
         ]
 
         return metrics
+
+
+class FeedbackEndpoint(
+    KonanBaseDeploymentEndpoint[
+        List[KonanFeedbackSubmission], KonanFeedbacksResult
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'feedback'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/predictions/feedback'
+
+    def prepare_request(
+        self, request_object: List[KonanFeedbackSubmission]
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(
+            data={
+                "feedback": [
+                    {
+                        "prediction_uuid": feedback.prediction_uuid,
+                        "target": feedback.target,
+                    } for feedback in request_object
+                ]
+            }
+        )
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> KonanFeedbacksResult:
+        return KonanFeedbacksResult(
+            [
+                KonanFeedbackStatus(
+                    feedback_status['prediction_uuid'],
+                    feedback_status['status'],
+                    feedback_status['message'],
+                ) for feedback_status in endpoint_response.json["data"]
+            ],
+            endpoint_response.json['success'],
+            endpoint_response.json['failure'],
+            endpoint_response.json['total']
+        )
