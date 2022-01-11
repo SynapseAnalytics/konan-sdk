@@ -67,7 +67,7 @@ class KonanSDK:
         :param start_time: use predictins made at or after this time
         :type start_time: datetime.datetime
         :param end_time: use predictins made before or at this time
-        :type end_time: datetime.datetim
+        :type end_time: datetime.datetime
         :return: A model evaluation object
         :rtype: EvaluateEndpoint.ResponseObject
         """
