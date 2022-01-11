@@ -1,10 +1,20 @@
+import datetime
 import sys
 from loguru import logger
-from typing import List, Optional, Dict, Union, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from konan_sdk.auth import KonanAuth
-from konan_sdk.endpoints.konan_endpoints import FeedbackEndpoint, PredictionEndpoint
-from konan_sdk.konan_types import KonanFeedbackSubmission, KonanFeedbacksResult
+from konan_sdk.endpoints.konan_endpoints import (
+    PredictionEndpoint,
+    EvaluateEndpoint,
+    FeedbackEndpoint,
+)
+from konan_sdk.konan_metrics import KonanBaseMetric
+from konan_sdk.konan_types import (
+    KonanFeedbackSubmission,
+    KonanFeedbacksResult,
+    KonanTimeWindow,
+)
 
 
 class KonanSDK:
@@ -51,6 +61,34 @@ class KonanSDK:
             deployment_uuid=deployment_uuid, user=self.auth.user
         ).post(input_data)
         return prediction.uuid, prediction.output
+
+    def evaluate(
+        self, deployment_uuid: str,
+        start_time: datetime.datetime, end_time: datetime.datetime
+    ) -> List[KonanBaseMetric]:
+        """Call the evaluate function for a given deployment
+
+        :param deployment_uuid: uuid of deployment to use for evaluation
+        :type deployment_uuid: str
+        :param start_time: use predictins made at or after this time
+        :type start_time: datetime.datetime
+        :param end_time: use predictins made before or at this time
+        :type end_time: datetime.datetime
+        :return: A model evaluation object
+        :rtype: EvaluateEndpoint.ResponseObject
+        """
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        model_metrics = EvaluateEndpoint(
+            self.api_url,
+            deployment_uuid=deployment_uuid, user=self.auth.user
+        ).post(KonanTimeWindow(start_time, end_time))
+
+        return model_metrics
 
     def feedback(
         self, deployment_uuid: str,

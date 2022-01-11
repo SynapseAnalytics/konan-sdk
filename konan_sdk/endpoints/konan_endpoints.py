@@ -1,14 +1,24 @@
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
+
 from konan_sdk.endpoints.base_endpoint import (
-    KonanBaseEndpoint, KonanBaseDeploymentEndpoint
+    KonanBaseEndpoint,
+    KonanBaseDeploymentEndpoint,
 )
 from konan_sdk.endpoints.interfaces import (
-    KonanEndpointRequest, KonanEndpointResponse
+    KonanEndpointRequest,
+    KonanEndpointResponse,
+)
+from konan_sdk.konan_metrics import (
+    KonanBaseMetric,
+    KonanCustomMetric,
+    KONAN_PREDEFINED_METRICS,
 )
 from konan_sdk.konan_types import (
-    KonanCredentials, KonanTokens,
+    KonanCredentials,
+    KonanTokens,
     KonanPrediction,
-    KonanFeedbackSubmission, KonanFeedbackStatus, KonanFeedbacksResult
+    KonanFeedbackSubmission, KonanFeedbackStatus, KonanFeedbacksResult,
+    KonanTimeWindow,
 )
 
 
@@ -77,6 +87,50 @@ class PredictionEndpoint(
             endpoint_response.json['prediction_uuid'],
             endpoint_response.json['output']
         )
+
+
+class EvaluateEndpoint(
+    KonanBaseDeploymentEndpoint[KonanTimeWindow, List[KonanBaseMetric]]
+):
+    @property
+    def name(self) -> str:
+        return 'evaluate'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/evaluate'
+
+    def prepare_request(
+        self, request_object: KonanTimeWindow
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(data={
+            'start_time': request_object.start_time.isoformat(),
+            'end_time': request_object.end_time.isoformat(),
+        })
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> List[KonanBaseMetric]:
+        predfined_metrics_dict: Dict[str, Any] = endpoint_response.json['metrics'].get(
+            "predefined", dict()
+        )
+        custom_metrics_list: List[Dict] = endpoint_response.json['metrics'].get(
+            "custom", list()
+        )
+
+        metrics: List[KonanBaseMetric] = [
+            KONAN_PREDEFINED_METRICS.get(metric_name, KonanCustomMetric)(
+                metric_value, name=metric_name
+            ) for metric_name, metric_value in predfined_metrics_dict.items()
+        ] + [
+            KonanCustomMetric(
+                metric_dict["metric_value"],
+                name=metric_dict["metric_name"]
+            )
+            for metric_dict in custom_metrics_list
+        ]
+
+        return metrics
 
 
 class FeedbackEndpoint(
