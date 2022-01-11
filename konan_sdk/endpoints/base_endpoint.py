@@ -152,7 +152,7 @@ class KonanBaseAuthenticatedEndpoint(KonanBaseEndpoint[ReqT, ResT]):
 
     @property
     def headers(self) -> Dict:
-        """Returns Adds Authorization key to self.headers
+        """Returns request headers with an Authorization Token added
 
         :return: request headers
         :rtype: Dict
@@ -185,7 +185,8 @@ class KonanBaseDeploymentEndpoint(KonanBaseAuthenticatedEndpoint[ReqT, ResT]):
         :type deployment_uuid: str
         :param user: user to authenticate as, defaults to None
         :type user: KonanUser
-        :raises ValueError: raises ValueError when deployment_uuid is not valid
+        :raises ValueError: raises ValueError with invalid deployment_uuid
+            and/or user args.
         """
         super().__init__(api_url, user=user, **kwargs)
         if deployment_uuid is None:
