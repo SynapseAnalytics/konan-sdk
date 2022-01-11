@@ -1,44 +1,41 @@
 
 from loguru import logger
 from typing import Optional
+from konan_sdk.konan_types import KonanCredentials
 
 from konan_sdk.konan_user import KonanUser
-from konan_sdk.endpoints.konan_endpoints import LoginEndpoint, RefreshTokenEndpoint
+from konan_sdk.endpoints.konan_endpoints import (
+    LoginEndpoint, RefreshTokenEndpoint
+)
 
 
 class KonanAuth:
     def __init__(self, auth_url: str, email: str, password: str):
-
         self.auth_url = auth_url
         self.email = email
         self.password = password
         self.user: Optional[KonanUser] = None
 
     def login(self) -> KonanUser:
-
-        payload = {
-            'email': self.email,
-            'password': self.password
-        }
-
-        response = LoginEndpoint(api_url=self.auth_url, user=self.user).post(payload=payload)
+        response = LoginEndpoint(self.auth_url).post(
+            KonanCredentials(self.email, self.password)
+        )
 
         logger.info(f"Successfully logged in using {self.email}")
 
-        self.user = KonanUser(response['access'], response['refresh'])
-
+        self.user = KonanUser(response.access, response.refresh)
         return self.user
 
     def _post_login_checks(self) -> None:
-        assert self.user is not None, "User credentials were not provided. Please use the .login() function first."
+        assert self.user is not None, "User credentials were not provided. Please use the .login() method first."
 
     def refresh_token(self) -> None:
         self._post_login_checks()
-        payload = {"refresh": self.user.refresh_token}
 
-        response = RefreshTokenEndpoint(api_url=self.auth_url, user=self.user).post(payload=payload)
-
-        self.user.set_access_token(response['access'])
+        new_access_token = RefreshTokenEndpoint(self.auth_url).post(
+            self.user.refresh_token
+        )
+        self.user.set_access_token(new_access_token)
 
     def auto_refresh_token(self) -> None:
 

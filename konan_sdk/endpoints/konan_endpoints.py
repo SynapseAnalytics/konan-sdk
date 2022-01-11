@@ -1,52 +1,123 @@
-from konan_sdk.endpoints.base_endpoint import KonanBaseEndpoint
+from typing import Dict, List, Union
+from konan_sdk.endpoints.base_endpoint import (
+    KonanBaseEndpoint, KonanBaseDeploymentEndpoint
+)
+from konan_sdk.endpoints.interfaces import (
+    KonanEndpointRequest, KonanEndpointResponse
+)
+from konan_sdk.konan_types import (
+    KonanCredentials, KonanTokens,
+    KonanPrediction,
+    KonanFeedbackSubmission, KonanFeedbackStatus, KonanFeedbacksResult
+)
 
 
-class LoginEndpoint(KonanBaseEndpoint):
-    name = 'login'
+class LoginEndpoint(KonanBaseEndpoint[KonanCredentials, KonanTokens]):
+    @property
+    def name(self) -> str:
+        return 'login'
 
     @property
-    def endpoint_path(self):
-        return '/api/auth/login/'
+    def endpoint_path(self) -> str:
+        return '/api/auth/login'
+
+    def prepare_request(
+        self, request_object: KonanCredentials
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(data={
+            'email': request_object.email,
+            'password': request_object.password
+        })
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> KonanTokens:
+        return KonanTokens(
+            endpoint_response.json['access'],
+            endpoint_response.json['refresh']
+        )
+
+
+class RefreshTokenEndpoint(KonanBaseEndpoint[str, str]):
+    @property
+    def name(self) -> str:
+        return 'refresh_token'
 
     @property
-    def headers(self):
-        return {}
+    def endpoint_path(self) -> str:
+        return '/api/auth/token/refresh'
+
+    def prepare_request(self, request_object: str) -> KonanEndpointRequest:
+        return KonanEndpointRequest(data={'refresh': request_object})
+
+    def process_response(self, endpoint_response: KonanEndpointResponse) -> str:
+        return endpoint_response.json['access']
 
 
-class RefreshTokenEndpoint(KonanBaseEndpoint):
-    name = 'refresh_token'
+class PredictionEndpoint(
+    KonanBaseDeploymentEndpoint[Union[Dict, str], KonanPrediction]
+):
+    @property
+    def name(self) -> str:
+        return 'predict'
 
     @property
-    def endpoint_path(self):
-        return '/api/auth/token/refresh/'
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/predict'
+
+    def prepare_request(
+        self, request_object: Union[Dict, str]
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(data=request_object)
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> KonanPrediction:
+        return KonanPrediction(
+            endpoint_response.json['prediction_uuid'],
+            endpoint_response.json['output']
+        )
+
+
+class FeedbackEndpoint(
+    KonanBaseDeploymentEndpoint[
+        List[KonanFeedbackSubmission], KonanFeedbacksResult
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'feedback'
 
     @property
-    def headers(self):
-        return {}
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/predictions/feedback'
 
+    def prepare_request(
+        self, request_object: List[KonanFeedbackSubmission]
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(
+            data={
+                "feedback": [
+                    {
+                        "prediction_uuid": feedback.prediction_uuid,
+                        "target": feedback.target,
+                    } for feedback in request_object
+                ]
+            }
+        )
 
-class PredictionEndpoint(KonanBaseEndpoint):
-    name = 'predict'
-
-    def __init__(self, api_url, user, deployment_uuid=None, **kwargs) -> None:
-
-        if deployment_uuid is None:
-            raise ValueError("A valid deployment_uuid must be specified")
-        super().__init__(api_url=api_url, user=user)
-
-        self.deployment_uuid = deployment_uuid
-
-    @property
-    def headers(self):
-        return {
-            'Authorization': f"Bearer {self.user.access_token}",
-            'Content-Type': 'application/json',
-        }
-
-    @property
-    def endpoint_path(self):
-        return f"/deployments/{self.deployment_uuid}/predict/"
-
-    def process_response(self):
-        prediction_uuid = self.response.pop('prediction_uuid')
-        self.response = prediction_uuid, self.response
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> KonanFeedbacksResult:
+        return KonanFeedbacksResult(
+            [
+                KonanFeedbackStatus(
+                    feedback_status['prediction_uuid'],
+                    feedback_status['status'],
+                    feedback_status['message'],
+                ) for feedback_status in endpoint_response.json["data"]
+            ],
+            endpoint_response.json['success'],
+            endpoint_response.json['failure'],
+            endpoint_response.json['total']
+        )
