@@ -165,8 +165,33 @@ class KonanBaseAuthenticatedEndpoint(KonanBaseEndpoint[ReqT, ResT]):
         }
 
 
-class KonanBaseDeploymentEndpoint(KonanBaseAuthenticatedEndpoint[ReqT, ResT]):
-    """Base Endpoint class for Konan endpoints that deal with deployments.
+class KonanBaseGenericDeploymentsEndpoint(
+    KonanBaseAuthenticatedEndpoint[ReqT, ResT]
+):
+    """Base Endpoint class for Konan endpoints that deal with deployments
+
+    :param ReqT: type of request_object to use in .get() and .post() methods
+    :type ReqT: type
+    :param ResT: type of object that .get() and .post() methods return
+    :type ResT: type
+    """
+
+    @property
+    def endpoint_path(self) -> str:
+        """Returns base generic deployments endpoint path,
+        relative to self.api_url
+
+        :return: endpoint path
+        :rtype: str
+        """
+        return "/deployments"
+
+
+class KonanBaseDeploymentEndpoint(
+    KonanBaseGenericDeploymentsEndpoint[ReqT, ResT]
+):
+    """Base Endpoint class for Konan endpoints that deal with
+    a specific deployment.
 
     :param ReqT: type of request_object to use in .get() and .post() methods
     :type ReqT: type
@@ -200,4 +225,4 @@ class KonanBaseDeploymentEndpoint(KonanBaseAuthenticatedEndpoint[ReqT, ResT]):
         :return: endpoint path
         :rtype: str
         """
-        return f"/deployments/{self.deployment_uuid}"
+        return super().endpoint_path() + f"/{self.deployment_uuid}"
