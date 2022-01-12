@@ -225,4 +225,4 @@ class KonanBaseDeploymentEndpoint(
         :return: endpoint path
         :rtype: str
         """
-        return super().endpoint_path() + f"/{self.deployment_uuid}"
+        return super().endpoint_path + f"/{self.deployment_uuid}"
