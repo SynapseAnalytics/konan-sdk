@@ -50,6 +50,3 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           semantic-release publish
-        env:
-          GH_TOKEN: ${{ secrets.KONAN_SDK_GITHUB_TOKEN }}
-          PyPI_TOKEN: ${{ secrets.PyPI_TOKEN }}
