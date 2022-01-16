@@ -1,4 +1,5 @@
 import datetime
+from enum import Enum
 from typing import Dict, List, Union
 
 
@@ -18,6 +19,62 @@ class KonanPrediction():
     def __init__(self, uuid: str, output: Dict) -> None:
         self.uuid = uuid
         self.output = output
+
+
+class KonanDockerCredentials():
+    def __init__(self, username: str, password: str) -> None:
+        self.username = username
+        self.password = password
+
+
+class KonanDockerImage():
+    def __init__(self, url: str, exposed_port: int) -> None:
+        self.url = url
+        self.exposed_port = exposed_port
+
+
+class KonanDeploymentCreationRequest():
+    def __init__(
+        self, name: str,
+        docker_credentials: KonanDockerCredentials,
+        docker_image: KonanDockerImage
+    ) -> None:
+        self.name = name
+        self.docker_credentials = docker_credentials
+        self.docker_image = docker_image
+
+
+class KonanDeploymentErrorType(Enum):
+    Image = 'image'
+    HealthEndpoint = 'health_endpoint'
+    ExposedPort = 'exposed_port'
+
+
+class KonanDeploymentError():
+    def __init__(self, type: KonanDeploymentErrorType, message: str) -> None:
+        self.type = type
+        self.message = message
+
+
+class KonanDeployment():
+    def __init__(
+        self,
+        uuid: str, name: str, created_at: datetime.datetime
+    ) -> None:
+        self.uuid = uuid
+        self.name = name
+        self.created_at = created_at
+
+
+class KonanDeploymentCreationResponse():
+    def __init__(
+        self,
+        deployment: KonanDeployment,
+        errors: List[KonanDeploymentError], container_logs: str
+    ) -> None:
+        self.deployment = deployment
+        self.errors = errors,
+        self.container_logs = container_logs
 
 
 class KonanTimeWindow():

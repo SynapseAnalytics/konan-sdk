@@ -1,7 +1,9 @@
+import datetime
 from typing import Any, Dict, List, Union
 
 from konan_sdk.endpoints.base_endpoint import (
     KonanBaseEndpoint,
+    KonanBaseGenericDeploymentsEndpoint,
     KonanBaseDeploymentEndpoint,
 )
 from konan_sdk.endpoints.interfaces import (
@@ -15,6 +17,11 @@ from konan_sdk.konan_metrics import (
 )
 from konan_sdk.konan_types import (
     KonanCredentials,
+    KonanDeployment,
+    KonanDeploymentCreationRequest,
+    KonanDeploymentCreationResponse,
+    KonanDeploymentError,
+    KonanDeploymentErrorType,
     KonanTokens,
     KonanPrediction,
     KonanFeedbackSubmission, KonanFeedbackStatus, KonanFeedbacksResult,
@@ -175,3 +182,60 @@ class FeedbackEndpoint(
             endpoint_response.json['failure'],
             endpoint_response.json['total']
         )
+
+
+class CreateDeploymentEndpoint(
+    KonanBaseGenericDeploymentsEndpoint[
+        KonanDeploymentCreationRequest,
+        KonanDeploymentCreationResponse
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'create-deployment'
+
+    def prepare_request(
+        self, request_object: KonanDeploymentCreationRequest
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(data={
+            'name': request_object.name,
+            'docker_username': request_object.docker_credentials.username,
+            'docker_password': request_object.docker_credentials.password,
+            'image_url': request_object.docker_image.url,
+            'exposed_port': request_object.docker_image.exposed_port,
+        })
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> KonanDeploymentCreationResponse:
+        return KonanDeploymentCreationResponse(
+            KonanDeployment(
+                endpoint_response.json['deployment']['uuid'],
+                endpoint_response.json['deployment']['name'],
+                datetime.datetime.fromisoformat(
+                    endpoint_response.json['deployment']['created_at'],
+                )
+            ),
+            [
+                KonanDeploymentError(
+                    KonanDeploymentErrorType(error['field']),
+                    error['message'],
+                ) for error in endpoint_response.json['errors']
+            ],
+            endpoint_response.json['container_logs']
+        )
+
+    # TODO: Currently, every endpoint class exposes BOTH .get() and .post()
+    # TODO: Perhaps it is better to explicitly support both or split them
+    def get(
+        self, request_object: KonanDeploymentCreationRequest
+    ) -> KonanDeploymentCreationResponse:
+        """Lists all deployments that this user has access to
+
+        :param request_object: endpoint request
+        :type request_object: KonanDeploymentCreationRequest
+        :raises NotImplementedError: Method not impelmented yet
+        :return: endpoint response
+        :rtype: KonanDeploymentCreationResponse
+        """
+        raise NotImplementedError()
