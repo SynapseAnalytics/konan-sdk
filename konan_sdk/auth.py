@@ -17,7 +17,7 @@ class KonanAuth:
         self.user: Optional[KonanUser] = None
 
     def login(self) -> KonanUser:
-        response = LoginEndpoint(self.auth_url).post(
+        response = LoginEndpoint(self.auth_url).request(
             KonanCredentials(self.email, self.password)
         )
 
@@ -32,7 +32,7 @@ class KonanAuth:
     def refresh_token(self) -> None:
         self._post_login_checks()
 
-        new_access_token = RefreshTokenEndpoint(self.auth_url).post(
+        new_access_token = RefreshTokenEndpoint(self.auth_url).request(
             self.user.refresh_token
         )
         self.user.set_access_token(new_access_token)
