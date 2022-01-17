@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Tuple, Union
 from konan_sdk.auth import KonanAuth
 from konan_sdk.endpoints.konan_endpoints import (
     CreateDeploymentEndpoint,
+    DeleteDeployment,
     PredictionEndpoint,
     EvaluateEndpoint,
     FeedbackEndpoint,
@@ -149,3 +150,28 @@ class KonanSDK:
             deployment_uuid=deployment_uuid, user=self.auth.user
         ).request(feedbacks)
         return feedbacks_result
+
+    def delete_deployment(
+        self,
+        deployment_uuid: str,
+    ) -> bool:
+        """Call the delete function for a given deployment
+        WARNING: Using this method with a valid deployment_uuid will DELETE it!!
+        :param deployment_uuid: uuid of deployment to delete
+        :type deployment_uuid: str
+        :return: success
+        :rtype: bool
+        """
+
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        delete_deployment_result = DeleteDeployment(
+            self.api_url,
+            deployment_uuid=deployment_uuid,
+            user=self.auth.user
+        ).request(None)
+        return delete_deployment_result
