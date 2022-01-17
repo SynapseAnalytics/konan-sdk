@@ -1,8 +1,12 @@
+import datetime
+from types import NoneType
 from typing import Any, Dict, List, Union
 
 from konan_sdk.endpoints.base_endpoint import (
     KonanBaseEndpoint,
+    KonanBaseGenericDeploymentsEndpoint,
     KonanBaseDeploymentEndpoint,
+    KonanEndpointOperationEnum,
 )
 from konan_sdk.endpoints.interfaces import (
     KonanEndpointRequest,
@@ -15,6 +19,11 @@ from konan_sdk.konan_metrics import (
 )
 from konan_sdk.konan_types import (
     KonanCredentials,
+    KonanDeployment,
+    KonanDeploymentCreationRequest,
+    KonanDeploymentCreationResponse,
+    KonanDeploymentError,
+    KonanDeploymentErrorType,
     KonanTokens,
     KonanPrediction,
     KonanFeedbackSubmission, KonanFeedbackStatus, KonanFeedbacksResult,
@@ -30,6 +39,10 @@ class LoginEndpoint(KonanBaseEndpoint[KonanCredentials, KonanTokens]):
     @property
     def endpoint_path(self) -> str:
         return '/api/auth/login'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
 
     def prepare_request(
         self, request_object: KonanCredentials
@@ -57,6 +70,10 @@ class RefreshTokenEndpoint(KonanBaseEndpoint[str, str]):
     def endpoint_path(self) -> str:
         return '/api/auth/token/refresh'
 
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
     def prepare_request(self, request_object: str) -> KonanEndpointRequest:
         return KonanEndpointRequest(data={'refresh': request_object})
 
@@ -74,6 +91,10 @@ class PredictionEndpoint(
     @property
     def endpoint_path(self) -> str:
         return super().endpoint_path + '/predict'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
 
     def prepare_request(
         self, request_object: Union[Dict, str]
@@ -99,6 +120,10 @@ class EvaluateEndpoint(
     @property
     def endpoint_path(self) -> str:
         return super().endpoint_path + '/evaluate'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
 
     def prepare_request(
         self, request_object: KonanTimeWindow
@@ -146,6 +171,10 @@ class FeedbackEndpoint(
     def endpoint_path(self) -> str:
         return super().endpoint_path + '/predictions/feedback'
 
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
     def prepare_request(
         self, request_object: List[KonanFeedbackSubmission]
     ) -> KonanEndpointRequest:
@@ -175,3 +204,75 @@ class FeedbackEndpoint(
             endpoint_response.json['failure'],
             endpoint_response.json['total']
         )
+
+
+class CreateDeploymentEndpoint(
+    KonanBaseGenericDeploymentsEndpoint[
+        KonanDeploymentCreationRequest,
+        KonanDeploymentCreationResponse
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'create-deployment'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
+    def prepare_request(
+        self, request_object: KonanDeploymentCreationRequest
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(data={
+            'name': request_object.name,
+            'docker_username': request_object.docker_credentials.username,
+            'docker_password': request_object.docker_credentials.password,
+            'image_url': request_object.docker_image.url,
+            'exposed_port': request_object.docker_image.exposed_port,
+        })
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> KonanDeploymentCreationResponse:
+        return KonanDeploymentCreationResponse(
+            KonanDeployment(
+                endpoint_response.json['deployment']['uuid'],
+                endpoint_response.json['deployment']['name'],
+                datetime.datetime.fromisoformat(
+                    endpoint_response.json['deployment']['created_at'],
+                )
+            ),
+            [
+                KonanDeploymentError(
+                    KonanDeploymentErrorType(error['field']),
+                    error['message'],
+                ) for error in endpoint_response.json['errors']
+            ],
+            endpoint_response.json['container_logs']
+        )
+
+
+class DeleteDeployment(
+    KonanBaseDeploymentEndpoint[
+        NoneType, bool
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'delete-deployment'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.DELETE
+
+    def prepare_request(
+        self, request_object: NoneType
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(
+            data=None
+        )
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> bool:
+        return True

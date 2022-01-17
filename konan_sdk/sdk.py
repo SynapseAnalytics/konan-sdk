@@ -5,12 +5,18 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from konan_sdk.auth import KonanAuth
 from konan_sdk.endpoints.konan_endpoints import (
+    CreateDeploymentEndpoint,
+    DeleteDeployment,
     PredictionEndpoint,
     EvaluateEndpoint,
     FeedbackEndpoint,
 )
 from konan_sdk.konan_metrics import KonanBaseMetric
 from konan_sdk.konan_types import (
+    KonanDeploymentCreationRequest,
+    KonanDeploymentCreationResponse,
+    KonanDockerCredentials,
+    KonanDockerImage,
     KonanFeedbackSubmission,
     KonanFeedbacksResult,
     KonanTimeWindow,
@@ -40,6 +46,36 @@ class KonanSDK:
         self.auth = KonanAuth(self.auth_url, email, password)
         self.auth.login()
 
+    def create_deployment(
+        self,
+        name: str,
+        docker_credentials: KonanDockerCredentials,
+        docker_image: KonanDockerImage
+    ) -> KonanDeploymentCreationResponse:
+        """Call the create deployment function
+
+        :param name: name of the deployment to create
+        :type name: str
+        :param docker_credentials: credentials for the docker registry to use
+        :type docker_credentials: KonanDockerCredentials
+        :param docker_image: docker image information
+        :type docker_image: KonanDockerImage
+        :return: konan_deployment_creation_response
+        :rtype: KonanDeploymentCreationResponse
+        """
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        deployment_creation_response = CreateDeploymentEndpoint(
+            self.api_url, user=self.auth.user
+        ).request(KonanDeploymentCreationRequest(
+            name, docker_credentials, docker_image
+        ))
+        return deployment_creation_response
+
     def predict(
         self,
         deployment_uuid: str, input_data: Union[Dict, str]
@@ -59,7 +95,7 @@ class KonanSDK:
         prediction = PredictionEndpoint(
             self.api_url,
             deployment_uuid=deployment_uuid, user=self.auth.user
-        ).post(input_data)
+        ).request(input_data)
         return prediction.uuid, prediction.output
 
     def evaluate(
@@ -86,7 +122,7 @@ class KonanSDK:
         model_metrics = EvaluateEndpoint(
             self.api_url,
             deployment_uuid=deployment_uuid, user=self.auth.user
-        ).post(KonanTimeWindow(start_time, end_time))
+        ).request(KonanTimeWindow(start_time, end_time))
 
         return model_metrics
 
@@ -112,5 +148,30 @@ class KonanSDK:
         feedbacks_result = FeedbackEndpoint(
             self.api_url,
             deployment_uuid=deployment_uuid, user=self.auth.user
-        ).post(feedbacks)
+        ).request(feedbacks)
         return feedbacks_result
+
+    def delete_deployment(
+        self,
+        deployment_uuid: str,
+    ) -> bool:
+        """Call the delete function for a given deployment
+        WARNING: Using this method with a valid deployment_uuid will DELETE it!!
+        :param deployment_uuid: uuid of deployment to delete
+        :type deployment_uuid: str
+        :return: success
+        :rtype: bool
+        """
+
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        delete_deployment_result = DeleteDeployment(
+            self.api_url,
+            deployment_uuid=deployment_uuid,
+            user=self.auth.user
+        ).request(None)
+        return delete_deployment_result
