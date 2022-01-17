@@ -157,7 +157,7 @@ class KonanSDK:
     ) -> bool:
         """Call the delete function for a given deployment
         WARNING: Using this method with a valid deployment_uuid will DELETE it!!
-        :param deployment_uuid: uuid of deployment to use for prediction
+        :param deployment_uuid: uuid of deployment to delete
         :type deployment_uuid: str
         :return: success
         :rtype: bool
