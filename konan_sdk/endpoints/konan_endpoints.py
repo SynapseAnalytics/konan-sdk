@@ -5,6 +5,7 @@ from konan_sdk.endpoints.base_endpoint import (
     KonanBaseEndpoint,
     KonanBaseGenericDeploymentsEndpoint,
     KonanBaseDeploymentEndpoint,
+    KonanEndpointOperationEnum,
 )
 from konan_sdk.endpoints.interfaces import (
     KonanEndpointRequest,
@@ -38,6 +39,10 @@ class LoginEndpoint(KonanBaseEndpoint[KonanCredentials, KonanTokens]):
     def endpoint_path(self) -> str:
         return '/api/auth/login'
 
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
     def prepare_request(
         self, request_object: KonanCredentials
     ) -> KonanEndpointRequest:
@@ -64,6 +69,10 @@ class RefreshTokenEndpoint(KonanBaseEndpoint[str, str]):
     def endpoint_path(self) -> str:
         return '/api/auth/token/refresh'
 
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
     def prepare_request(self, request_object: str) -> KonanEndpointRequest:
         return KonanEndpointRequest(data={'refresh': request_object})
 
@@ -81,6 +90,10 @@ class PredictionEndpoint(
     @property
     def endpoint_path(self) -> str:
         return super().endpoint_path + '/predict'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
 
     def prepare_request(
         self, request_object: Union[Dict, str]
@@ -106,6 +119,10 @@ class EvaluateEndpoint(
     @property
     def endpoint_path(self) -> str:
         return super().endpoint_path + '/evaluate'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
 
     def prepare_request(
         self, request_object: KonanTimeWindow
@@ -153,6 +170,10 @@ class FeedbackEndpoint(
     def endpoint_path(self) -> str:
         return super().endpoint_path + '/predictions/feedback'
 
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
     def prepare_request(
         self, request_object: List[KonanFeedbackSubmission]
     ) -> KonanEndpointRequest:
@@ -194,6 +215,10 @@ class CreateDeploymentEndpoint(
     def name(self) -> str:
         return 'create-deployment'
 
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
     def prepare_request(
         self, request_object: KonanDeploymentCreationRequest
     ) -> KonanEndpointRequest:
@@ -224,18 +249,3 @@ class CreateDeploymentEndpoint(
             ],
             endpoint_response.json['container_logs']
         )
-
-    # TODO: Currently, every endpoint class exposes BOTH .get() and .post()
-    # TODO: Perhaps it is better to explicitly support both or split them
-    def get(
-        self, request_object: KonanDeploymentCreationRequest
-    ) -> KonanDeploymentCreationResponse:
-        """Lists all deployments that this user has access to
-
-        :param request_object: endpoint request
-        :type request_object: KonanDeploymentCreationRequest
-        :raises NotImplementedError: Method not impelmented yet
-        :return: endpoint response
-        :rtype: KonanDeploymentCreationResponse
-        """
-        raise NotImplementedError()

@@ -70,7 +70,7 @@ class KonanSDK:
 
         deployment_creation_response = CreateDeploymentEndpoint(
             self.api_url, user=self.auth.user
-        ).post(KonanDeploymentCreationRequest(
+        ).request(KonanDeploymentCreationRequest(
             name, docker_credentials, docker_image
         ))
         return deployment_creation_response
@@ -94,7 +94,7 @@ class KonanSDK:
         prediction = PredictionEndpoint(
             self.api_url,
             deployment_uuid=deployment_uuid, user=self.auth.user
-        ).post(input_data)
+        ).request(input_data)
         return prediction.uuid, prediction.output
 
     def evaluate(
@@ -121,7 +121,7 @@ class KonanSDK:
         model_metrics = EvaluateEndpoint(
             self.api_url,
             deployment_uuid=deployment_uuid, user=self.auth.user
-        ).post(KonanTimeWindow(start_time, end_time))
+        ).request(KonanTimeWindow(start_time, end_time))
 
         return model_metrics
 
@@ -147,5 +147,5 @@ class KonanSDK:
         feedbacks_result = FeedbackEndpoint(
             self.api_url,
             deployment_uuid=deployment_uuid, user=self.auth.user
-        ).post(feedbacks)
+        ).request(feedbacks)
         return feedbacks_result

@@ -1,3 +1,4 @@
+from enum import Enum
 import requests
 from loguru import logger
 from typing import Dict, Generic, Optional, TypeVar
@@ -10,6 +11,12 @@ from konan_sdk.endpoints.interfaces import (
 
 ReqT = TypeVar('ReqT')
 ResT = TypeVar('ResT')
+
+
+class KonanEndpointOperationEnum(Enum):
+    GET = requests.get
+    POST = requests.post
+    DELETE = requests.delete
 
 
 class KonanBaseEndpoint(Generic[ReqT, ResT]):
@@ -50,6 +57,16 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
         return None
 
     @property
+    @abstractmethod
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        """Returns the operation to use on the endpoint path
+
+        :return: operation
+        :rtype: KonanEndpointOperationEnum
+        """
+        return None
+
+    @property
     def request_url(self) -> str:
         """Returns the full API URL
 
@@ -79,8 +96,10 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
         # Override method with logic to implement after receiving response
         return None
 
-    def post(self, request_object: ReqT) -> ResT:
-        """Base POST method for all Konan endpoints
+    def request(self, request_object: ReqT) -> ResT:
+        """Base REST method for all Konan endpoints
+        Depending on the endpoint's endpoint_operation, the corresponding
+        method will be used
 
         :param request_object: endpoint request
         :type request_object: ReqT
@@ -90,33 +109,10 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
         endpoint_request = self.prepare_request(request_object)
 
         logger.debug(f"Sending {self.name} request")
-        response = requests.post(
+        response: requests.Response = self.endpoint_operation(
             self.request_url, headers=self.headers,
-            data=endpoint_request.data, params=endpoint_request.params)
-        logger.debug(f"Received response from {self.name}, parsing output")
-
-        response.raise_for_status()
-
-        endpoint_response = KonanEndpointResponse(
-            status_code=response.status_code, json=response.json()
+            data=endpoint_request.data, params=endpoint_request.params
         )
-        response_object = self.process_response(endpoint_response)
-        return response_object
-
-    def get(self, request_object: ReqT) -> ResT:
-        """Base GET method for all Konan endpoints
-
-        :param request_object: endpoint request
-        :type request_object: ReqT
-        :return: endpoint response
-        :rtype: ResT
-        """
-        endpoint_request = self.prepare_request(request_object)
-
-        logger.debug(f"Sending {self.name} request")
-        response = requests.get(
-            self.request_url, headers=self.headers,
-            data=endpoint_request.data, params=endpoint_request.params)
         logger.debug(f"Received response from {self.name}, parsing output")
 
         response.raise_for_status()
