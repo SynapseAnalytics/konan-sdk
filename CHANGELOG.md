@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v1.2.0 (2022-01-17)
+### Feature
+* **endpoints:** Add delete deployment endpoint ([#13](https://github.com/SynapseAnalytics/konan-sdk/issues/13)) ([`63781b1`](https://github.com/SynapseAnalytics/konan-sdk/commit/63781b19c9e7c96a24c62e347c4ab9c82686a1e8))
+* **endpoints:** Add create deployment endpoint ([`0089316`](https://github.com/SynapseAnalytics/konan-sdk/commit/00893162dc055fe817427789728799673b2d3539))
+
+### Fix
+* **base-endpoints:** Treat endpoint_path as property not func ([`f1e192c`](https://github.com/SynapseAnalytics/konan-sdk/commit/f1e192cdafb25148f27112cff054b1c12314f775))
+
 ## v1.1.0 (2022-01-12)
 ### Feature
 * **endpoints:** Add evaluate endpoint ([`20aa0ef`](https://github.com/SynapseAnalytics/konan-sdk/commit/20aa0efd579d6493dead30949cc0723c7f178cd5))
