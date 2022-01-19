@@ -214,7 +214,7 @@ class CreateDeploymentEndpoint(
     @property
     def name(self) -> str:
         return 'create-deployment'
-    
+
     @property
     def endpoint_path(self) -> str:
         return super().endpoint_path + '/'
@@ -263,7 +263,7 @@ class DeleteDeployment(
     @property
     def name(self) -> str:
         return 'delete-deployment'
-    
+
     @property
     def endpoint_path(self) -> str:
         return super().endpoint_path + '/'
