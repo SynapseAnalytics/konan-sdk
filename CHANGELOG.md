@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v1.2.1 (2022-01-19)
+
+### Fix
+* **base-endpoints:** Fix endpoint paths
+
 ## v1.2.0 (2022-01-17)
 ### Feature
 * **endpoints:** Add delete deployment endpoint ([#13](https://github.com/SynapseAnalytics/konan-sdk/issues/13)) ([`63781b1`](https://github.com/SynapseAnalytics/konan-sdk/commit/63781b19c9e7c96a24c62e347c4ab9c82686a1e8))
