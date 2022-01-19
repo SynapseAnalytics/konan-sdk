@@ -1,7 +1,7 @@
 class KonanEndpointRequest():
-    def __init__(self, params=None, data=None):
+    def __init__(self, params=None, json=None):
         self.params = params
-        self.data = data
+        self.json = json
 
 
 class KonanEndpointResponse():

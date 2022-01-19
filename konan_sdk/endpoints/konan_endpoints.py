@@ -37,7 +37,7 @@ class LoginEndpoint(KonanBaseEndpoint[KonanCredentials, KonanTokens]):
 
     @property
     def endpoint_path(self) -> str:
-        return '/api/auth/login'
+        return '/api/auth/login/'
 
     @property
     def endpoint_operation(self) -> KonanEndpointOperationEnum:
@@ -46,7 +46,7 @@ class LoginEndpoint(KonanBaseEndpoint[KonanCredentials, KonanTokens]):
     def prepare_request(
         self, request_object: KonanCredentials
     ) -> KonanEndpointRequest:
-        return KonanEndpointRequest(data={
+        return KonanEndpointRequest(json={
             'email': request_object.email,
             'password': request_object.password
         })
@@ -67,14 +67,14 @@ class RefreshTokenEndpoint(KonanBaseEndpoint[str, str]):
 
     @property
     def endpoint_path(self) -> str:
-        return '/api/auth/token/refresh'
+        return '/api/auth/token/refresh/'
 
     @property
     def endpoint_operation(self) -> KonanEndpointOperationEnum:
         return KonanEndpointOperationEnum.POST
 
     def prepare_request(self, request_object: str) -> KonanEndpointRequest:
-        return KonanEndpointRequest(data={'refresh': request_object})
+        return KonanEndpointRequest(json={'refresh': request_object})
 
     def process_response(self, endpoint_response: KonanEndpointResponse) -> str:
         return endpoint_response.json['access']
@@ -89,7 +89,7 @@ class PredictionEndpoint(
 
     @property
     def endpoint_path(self) -> str:
-        return super().endpoint_path + '/predict'
+        return super().endpoint_path + '/predict/'
 
     @property
     def endpoint_operation(self) -> KonanEndpointOperationEnum:
@@ -98,7 +98,7 @@ class PredictionEndpoint(
     def prepare_request(
         self, request_object: Union[Dict, str]
     ) -> KonanEndpointRequest:
-        return KonanEndpointRequest(data=request_object)
+        return KonanEndpointRequest(json=request_object)
 
     def process_response(
         self, endpoint_response: KonanEndpointResponse
@@ -118,7 +118,7 @@ class EvaluateEndpoint(
 
     @property
     def endpoint_path(self) -> str:
-        return super().endpoint_path + '/evaluate'
+        return super().endpoint_path + '/evaluate/'
 
     @property
     def endpoint_operation(self) -> KonanEndpointOperationEnum:
@@ -127,7 +127,7 @@ class EvaluateEndpoint(
     def prepare_request(
         self, request_object: KonanTimeWindow
     ) -> KonanEndpointRequest:
-        return KonanEndpointRequest(data={
+        return KonanEndpointRequest(json={
             'start_time': request_object.start_time.isoformat(),
             'end_time': request_object.end_time.isoformat(),
         })
@@ -168,7 +168,7 @@ class FeedbackEndpoint(
 
     @property
     def endpoint_path(self) -> str:
-        return super().endpoint_path + '/predictions/feedback'
+        return super().endpoint_path + '/predictions/feedback/'
 
     @property
     def endpoint_operation(self) -> KonanEndpointOperationEnum:
@@ -178,7 +178,7 @@ class FeedbackEndpoint(
         self, request_object: List[KonanFeedbackSubmission]
     ) -> KonanEndpointRequest:
         return KonanEndpointRequest(
-            data={
+            json={
                 "feedback": [
                     {
                         "prediction_uuid": feedback.prediction_uuid,
@@ -214,6 +214,10 @@ class CreateDeploymentEndpoint(
     @property
     def name(self) -> str:
         return 'create-deployment'
+    
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/'
 
     @property
     def endpoint_operation(self) -> KonanEndpointOperationEnum:
@@ -222,7 +226,7 @@ class CreateDeploymentEndpoint(
     def prepare_request(
         self, request_object: KonanDeploymentCreationRequest
     ) -> KonanEndpointRequest:
-        return KonanEndpointRequest(data={
+        return KonanEndpointRequest(json={
             'name': request_object.name,
             'docker_username': request_object.docker_credentials.username,
             'docker_password': request_object.docker_credentials.password,
@@ -259,6 +263,10 @@ class DeleteDeployment(
     @property
     def name(self) -> str:
         return 'delete-deployment'
+    
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/'
 
     @property
     def endpoint_operation(self) -> KonanEndpointOperationEnum:
@@ -267,9 +275,7 @@ class DeleteDeployment(
     def prepare_request(
         self, request_object: None
     ) -> KonanEndpointRequest:
-        return KonanEndpointRequest(
-            data=None
-        )
+        return KonanEndpointRequest()
 
     def process_response(
         self, endpoint_response: KonanEndpointResponse

@@ -111,7 +111,7 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
         logger.debug(f"Sending {self.name} request")
         response: requests.Response = self.endpoint_operation(
             self.request_url, headers=self.headers,
-            data=endpoint_request.data, params=endpoint_request.params
+            json=endpoint_request.json, params=endpoint_request.params
         )
         logger.debug(f"Received response from {self.name}, parsing output")
 
