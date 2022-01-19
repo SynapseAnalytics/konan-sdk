@@ -1,5 +1,4 @@
 import datetime
-from types import NoneType
 from typing import Any, Dict, List, Union
 
 from konan_sdk.endpoints.base_endpoint import (
@@ -254,7 +253,7 @@ class CreateDeploymentEndpoint(
 
 class DeleteDeployment(
     KonanBaseDeploymentEndpoint[
-        NoneType, bool
+        None, bool
     ]
 ):
     @property
@@ -266,7 +265,7 @@ class DeleteDeployment(
         return KonanEndpointOperationEnum.DELETE
 
     def prepare_request(
-        self, request_object: NoneType
+        self, request_object: None
     ) -> KonanEndpointRequest:
         return KonanEndpointRequest(
             data=None
