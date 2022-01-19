@@ -5,7 +5,7 @@
 ## v1.2.1 (2022-01-19)
 
 ### Fix
-* **base-endpoints:** Fix endpoint paths
+* **endpoints:** Fix importing NoneType ([`d17786c`](https://github.com/SynapseAnalytics/konan-sdk/commit/d17786c5c447559f6e798c3276f9b1aa4f67f337))
 
 ## v1.2.0 (2022-01-17)
 ### Feature
