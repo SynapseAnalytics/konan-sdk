@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.2.2 (2022-01-19)
+### Fix
+* **endpoints:** Fix endpoint paths with trailing slash ([`7d05b42`](https://github.com/SynapseAnalytics/konan-sdk/commit/7d05b42fa9edf7685061d57680f2786807656340))
+
 ## v1.2.1 (2022-01-19)
 
 ### Fix
