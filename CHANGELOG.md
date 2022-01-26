@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v1.2.3 (2022-01-26)
+### Fix
+* **Endpoints:** Fix handling endpoint without JSON response ([`d69a13f`](https://github.com/SynapseAnalytics/konan-sdk/commit/d69a13f1dbbbdfa5b02600c05299e16d01db53e3))
+* **Metrics:** Fix creating a KonanCustomMetric ([`83b0601`](https://github.com/SynapseAnalytics/konan-sdk/commit/83b06017d23b44cc7d90e92c96376edf6596ad7c))
+
 ## v1.2.2 (2022-01-19)
 ### Fix
 * **endpoints:** Fix endpoint paths with trailing slash ([`7d05b42`](https://github.com/SynapseAnalytics/konan-sdk/commit/7d05b42fa9edf7685061d57680f2786807656340))
