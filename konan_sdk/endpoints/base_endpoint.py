@@ -123,9 +123,9 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
         except JSONDecodeError:
             response_json = None
         endpoint_response = KonanEndpointResponse(
-            status_code=response.status_code,json=response_json,
+            status_code=response.status_code, json=response_json,
         )
-        
+
         response_object = self.process_response(endpoint_response)
         return response_object
 
