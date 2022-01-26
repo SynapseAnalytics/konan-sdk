@@ -60,7 +60,7 @@ class KonanCustomMetric(KonanBaseMetric):
         return self.__metric_name
 
     def __init__(self, value: Any, name="undefined", **kwargs):
-        super().__init__(value, kwargs)
+        super().__init__(value, **kwargs)
         self.__metric_name = name
 
 
