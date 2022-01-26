@@ -145,7 +145,7 @@ class EvaluateEndpoint(
         metrics: List[KonanBaseMetric] = [
             KONAN_PREDEFINED_METRICS.get(metric_name, KonanCustomMetric)(
                 metric_value, name=metric_name
-            ) for metric_name, metric_value in predfined_metrics_dict.items()
+            ) for metric_name, metric_value in predfined_metrics_dict.items() if metric_value is not None
         ] + [
             KonanCustomMetric(
                 metric_dict["metric_value"],
