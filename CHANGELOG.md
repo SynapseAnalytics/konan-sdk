@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.2.4 (2022-01-26)
+### Fix
+* **Evaluate:** Fix returning empty metrics ([`39c6f15`](https://github.com/SynapseAnalytics/konan-sdk/commit/39c6f15effc9037a30fd2a4bd1fc060d3280d573))
+
 ## v1.2.3 (2022-01-26)
 ### Fix
 * **Endpoints:** Fix handling endpoint without JSON response ([`d69a13f`](https://github.com/SynapseAnalytics/konan-sdk/commit/d69a13f1dbbbdfa5b02600c05299e16d01db53e3))
