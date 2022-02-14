@@ -24,6 +24,8 @@ from konan_sdk.konan_types import (
 
 
 class KonanSDK:
+    """konan-sdk's main class for API integration.
+    """
     def __init__(
         self, auth_url="https://auth.konan.ai", api_url="https://api.konan.ai",
         verbose=False
