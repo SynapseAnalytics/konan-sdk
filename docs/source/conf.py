@@ -6,7 +6,7 @@ project = 'konan-sdk'
 copyright = '2022, Synapse Analytics'
 author = 'Synapse Analytics'
 
-version = '1.2.4'
+version = '1.2.5'
 
 # -- General configuration
 
