@@ -26,15 +26,21 @@ pep8-naming = "^0.12.1"
 pytest = "^6.2.4"
 python-semantic-release = "^7.19.2"
 PyYAML = "^6.0"
+Sphinx = "^4.4.0"
+sphinx-rtd-theme = "^1.0.0"
 
 [tool.semantic_release]
 branch = "main"
 version_variable = [
     "konan_sdk/__init__.py:__version__",
+    "docs/source/conf.py:version",
     "pyproject.toml:version",
 ]
 version_toml = [
     "pyproject.toml:tool.poetry.version"
+]
+version_pattern = [
+    "docs/requirements.txt:konan_sdk=={version}",
 ]
 commit_author = "github-actions <actions@github.com>"
 upload_to_repository = true

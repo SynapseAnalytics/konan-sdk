@@ -23,19 +23,25 @@ class KonanService():
     ) -> None:
         """Initializes a konan service
 
-        Args:
-            predict_request_class (Type): Type of a prediction request.
-                Should be a class that inherits from KonanServiceBasePredictionRequest
-            predict_response_class (Type): Type of a prediction response.
-                Should be a class that inherits from KonanServiceBasePredictionResponse
-            model_class (Type): Type of the model that does the prediction.
-                Should be a class that inherits from KonanServiceBaseModel.
-                Must implement the predict() and evaluate() methods
-            feedback_target_class (Type, optional): Type of feedback target.
-                Defaults to value of predict_response_class if None.
-            evaluate_response_class (Type, optional): Type of an evaluation response.
-                Should be a class that inherits from KonanServiceBaseEvaluateResponse.
-                Defaults to KonanServiceBaseEvaluateResponse.
+        :param predict_request_class: Type of a prediction request.
+            Should be a class that inherits from KonanServiceBasePredictionRequest
+        :type predict_request_class: Type
+        :param predict_response_class: Type of a prediction response.
+            Should be a class that inherits from KonanServiceBasePredictionResponse
+        :type predict_response_class: Type
+        :param model_class: Type of the model that does the prediction.
+            Should be a class that inherits from KonanServiceBaseModel.
+            Must implement the predict() and evaluate() methods
+        :type model_class: Type
+        :param feedback_target_class: Type of feedback target.
+            Defaults to value of predict_response_class if None.
+        :type feedback_target_class: Type, optional
+        :param evaluate_response_class: Type of an evaluation response.
+            Should be a class that inherits from KonanServiceBaseEvaluateResponse,
+            defaults to KonanServiceBaseEvaluateResponse
+        :type evaluate_response_class: Type, optional
+        :return: None
+        :rtype: Type
         """
         self.model = model_class(*model_args, **model_kwargs)
         self.app = FastAPI(openapi_url='/docs', docs_url='/swagger')
