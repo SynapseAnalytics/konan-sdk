@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.2.5 (2022-02-14)
+### Fix
+* **docs:** Add more descriptive doc strings ([`344fc59`](https://github.com/SynapseAnalytics/konan-sdk/commit/344fc59f3401b76fbbd419ff6b98fad7a04520af))
+
 ## v1.2.4 (2022-01-26)
 ### Fix
 * **Evaluate:** Fix returning empty metrics ([`39c6f15`](https://github.com/SynapseAnalytics/konan-sdk/commit/39c6f15effc9037a30fd2a4bd1fc060d3280d573))
