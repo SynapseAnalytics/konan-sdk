@@ -11,12 +11,10 @@ class KonanServiceBaseModel(abc.ABC):
     def predict(self, req: KonanServiceBasePredictionRequest) -> KonanServiceBasePredictionResponse:
         """Predicts using the preprocessed_input
 
-        Args:
-            req (PredictionRequestClass): raw request data from API
-
-        Returns:
-            PredictionResponseClass: prediction.
-            This will be the response returned by the API.
+        :param req: raw request data from API
+        :type req: KonanServiceBasePredictionRequest
+        :return: This will be the response returned by the API.
+        :rtype: KonanServiceBasePredictionResponse
         """
         pass
 
@@ -24,11 +22,9 @@ class KonanServiceBaseModel(abc.ABC):
     def evaluate(self, req: KonanServiceBaseEvaluateRequest) -> KonanServiceBaseEvaluateResponse:
         """Evaluates the model using past predictions and their feedback
 
-        Args:
-            req (KonanServiceBaseEvaluateRequest): raw request data from API
-
-        Returns:
-            KonanServiceBaseEvaluateResponse: evaluation.
-            This will be the response returned by the API.
+        :param req: raw request data from API
+        :type req: KonanServiceBaseEvaluateRequest
+        :return: This will be the response returned by the API
+        :rtype: KonanServiceBaseEvaluateResponse
         """
         pass

@@ -41,7 +41,9 @@ class KonanSDK:
         """Login to Konan with user credentials
 
         :param email: email of registered user
+        :type email: str
         :param password: password of registered user
+        :type password: str
         """
         self.auth = KonanAuth(self.auth_url, email, password)
         self.auth.login()
@@ -83,8 +85,11 @@ class KonanSDK:
         """Call the predict function for a given deployment
 
         :param deployment_uuid: uuid of deployment to use for prediction
+        :type deployment_uuid: str
         :param input_data: data to pass to the model
+        :type input_data: Union[Dict, str]
         :return: A tuple of prediction uuid and the prediction output
+        :rtype: Tuple[str, Dict]
         """
         # check user performed login
         self.auth._post_login_checks()
