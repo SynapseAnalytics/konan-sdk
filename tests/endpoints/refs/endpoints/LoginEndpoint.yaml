@@ -1,0 +1,6 @@
+---
+name: login
+endpoint_path: /api/auth/login/
+endpoint_operation: POST
+headers:
+  Content-Type: application/json

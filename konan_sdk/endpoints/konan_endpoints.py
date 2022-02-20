@@ -247,9 +247,14 @@ class CreateDeploymentEndpoint(
             ),
             [
                 KonanDeploymentError(
-                    KonanDeploymentErrorType(error['field']),
-                    error['message'],
-                ) for error in endpoint_response.json['errors']
+                    KonanDeploymentErrorType(error['field']), error['message'],
+                )
+                for error in endpoint_response.json['errors'] if error['field'] in [e.value for e in KonanDeploymentErrorType]
+            ] + [
+                KonanDeploymentError(
+                    KonanDeploymentErrorType.Other, error['message'],
+                )
+                for error in endpoint_response.json['errors'] if error['field'] not in [e.value for e in KonanDeploymentErrorType]
             ],
             endpoint_response.json['container_logs']
         )

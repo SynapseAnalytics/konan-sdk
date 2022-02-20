@@ -109,6 +109,7 @@ class KonanDeploymentErrorType(Enum):
     Image = 'image'  #: Deployment Image Error
     HealthEndpoint = 'health_endpoint'  #: Healthz Error
     ExposedPort = 'exposed_port'  #: Exposed Port Error
+    Other = 'other'  #: Other Error
 
 
 class KonanDeploymentError():
@@ -124,6 +125,15 @@ class KonanDeploymentError():
         """
         self.type = type
         self.message = message
+
+    def __eq__(self, other):
+        if isinstance(other, KonanDeploymentError):
+            return self.type == other.type \
+                and self.message == other.message
+        return False
+
+    def __hash__(self):
+        return hash((self.type, self.message))
 
 
 class KonanDeployment():
@@ -153,7 +163,8 @@ class KonanDeploymentCreationResponse():
     def __init__(
         self,
         deployment: KonanDeployment,
-        errors: List[KonanDeploymentError], container_logs: str
+        errors: List[KonanDeploymentError],
+        container_logs: str
     ) -> None:
         """ Initialize a new KonanDeploymentCreationResponse.
 
@@ -165,7 +176,7 @@ class KonanDeploymentCreationResponse():
         :type container_logs: str
         """
         self.deployment = deployment
-        self.errors = errors,
+        self.errors = errors
         self.container_logs = container_logs
 
 
@@ -218,6 +229,16 @@ class KonanFeedbackStatus():
         self.prediction_uuid = prediction_uuid
         self.status = status
         self.message = message
+
+    def __eq__(self, other):
+        if isinstance(other, KonanFeedbackStatus):
+            return self.prediction_uuid == other.prediction_uuid \
+                and self.status == other.status \
+                and self.message == other.message
+        return False
+
+    def __hash__(self):
+        return hash((self.prediction_uuid, self.status, self.message))
 
 
 class KonanFeedbacksResult():

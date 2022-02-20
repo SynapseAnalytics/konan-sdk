@@ -1,0 +1,7 @@
+---
+name: evaluate
+endpoint_path: /deployments/<deployment_uuid>/evaluate/
+endpoint_operation: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer <access_token>

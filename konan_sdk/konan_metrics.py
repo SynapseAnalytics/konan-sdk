@@ -23,6 +23,14 @@ class KonanBaseMetric(ABC):
         """
         self.value = value
 
+    def __eq__(self, other):
+        if isinstance(other, KonanBaseMetric):
+            return self.name == other.name and self.value == other.value
+        return False
+
+    def __hash__(self):
+        return hash((self.name, self.value))
+
 
 class KonanRMSEMetric(KonanBaseMetric):
     """Konan RMSE Metric.
