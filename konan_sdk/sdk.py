@@ -9,9 +9,10 @@ from konan_sdk.endpoints.konan_endpoints import (
     CreateModelEndpoint,
     DeleteDeployment,
     DeleteModelEndpoint,
-    PredictionEndpoint,
     EvaluateEndpoint,
     FeedbackEndpoint,
+    GetModelsEndpoint,
+    PredictionEndpoint,
 )
 from konan_sdk.konan_metrics import KonanBaseMetric
 from konan_sdk.konan_types import (
@@ -136,8 +137,32 @@ class KonanSDK:
                 docker_image,
             )
         )
-        return deployment_creation_response
+        return konan_model
 
+    def get_models(
+        self,
+        deployment_uuid: str,
+    ) -> List[KonanModel]:
+        """Call the get models function
+
+        :param deployment_uuid: uuid of the deployment to get its models
+        :type deployment_uuid: str
+        :return: konan_models
+        :rtype: List[KonanModel]
+        """
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        konan_models = GetModelsEndpoint(
+            self.api_url,
+            user=self.auth.user,
+            deployment_uuid=deployment_uuid,
+        ).request()
+
+        return konan_models
 
     def predict(
         self,

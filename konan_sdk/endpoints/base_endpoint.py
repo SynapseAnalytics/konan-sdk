@@ -249,7 +249,7 @@ class KonanBaseDeploymentGenericModelsEndpoint(
         :return: endpoint path
         :rtype: str
         """
-        return super().endpoint_path + f"/models"
+        return super().endpoint_path + "/models"
 
 
 class KonanBaseModelEndpoint(
@@ -266,7 +266,7 @@ class KonanBaseModelEndpoint(
     def __init__(
         self, api_url: str,
         user: KonanUser = None,
-        model_uuid: str = None, 
+        model_uuid: str = None,
         **kwargs
     ) -> None:
         """Initializes a Konan endpoint that deals with a model
