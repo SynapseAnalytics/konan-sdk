@@ -25,6 +25,7 @@ from konan_sdk.konan_types import (
     KonanDeploymentCreationResponse,
     KonanDeploymentError,
     KonanDeploymentErrorType,
+    KonanModelCreationRequest,
     KonanModelState,
     KonanModel,
     KonanTokens,
@@ -317,6 +318,47 @@ class CreateModelEndpoint(
         )
 
 
+class GetModelsEndpoint(
+    KonanBaseDeploymentGenericModelsEndpoint[
+        None,
+        List[KonanModel],
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'get-models'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.GET
+
+    def prepare_request(
+        self, request_object: None
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest()
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> List[KonanModel]:
+        return [
+            KonanModel(
+                model['uuid'],
+                model['name'],
+                datetime.datetime.fromisoformat(
+                    model['created_at'],
+                ),
+                string_to_konan_enum(
+                    model['state'],
+                    KonanModelState,
+                ),
+            ) for model in endpoint_response.json['results']
+        ]
+
+
 class DeleteModelEndpoint(
     KonanBaseModelEndpoint[
         None, bool
@@ -343,6 +385,7 @@ class DeleteModelEndpoint(
         self, endpoint_response: KonanEndpointResponse
     ) -> bool:
         return True
+
 
 class DeleteDeployment(
     KonanBaseDeploymentEndpoint[
