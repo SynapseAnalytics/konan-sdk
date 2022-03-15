@@ -6,6 +6,7 @@ from konan_sdk.endpoints.base_endpoint import (
     KonanBaseGenericDeploymentsEndpoint,
     KonanBaseDeploymentEndpoint,
     KonanBaseDeploymentGenericModelsEndpoint,
+    KonanBaseModelEndpoint,
     KonanEndpointOperationEnum,
 )
 from konan_sdk.endpoints.interfaces import (
@@ -315,6 +316,33 @@ class CreateModelEndpoint(
             ),
         )
 
+
+class DeleteModelEndpoint(
+    KonanBaseModelEndpoint[
+        None, bool
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'delete-model'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.DELETE
+
+    def prepare_request(
+        self, request_object: None
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest()
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> bool:
+        return True
 
 class DeleteDeployment(
     KonanBaseDeploymentEndpoint[

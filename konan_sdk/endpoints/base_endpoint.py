@@ -250,3 +250,46 @@ class KonanBaseDeploymentGenericModelsEndpoint(
         :rtype: str
         """
         return super().endpoint_path + f"/models"
+
+
+class KonanBaseModelEndpoint(
+    KonanBaseGenericDeploymentsEndpoint[ReqT, ResT]
+):
+    """Base Endpoint class for Konan endpoints that deal with
+    a specific model.
+
+    :param ReqT: type of request_object to use in .get() and .post() methods
+    :type ReqT: type
+    :param ResT: type of object that .get() and .post() methods return
+    :type ResT: type
+    """
+    def __init__(
+        self, api_url: str,
+        user: KonanUser = None,
+        model_uuid: str = None, 
+        **kwargs
+    ) -> None:
+        """Initializes a Konan endpoint that deals with a model
+
+        :param api_url: base URL of Konan API
+        :type api_url: str
+        :param user: user to authenticate as, defaults to None
+        :type user: KonanUser
+        :param model_uuid: model uuid to use, defaults to None
+        :type model_uuid: str
+        :raises ValueError: raises ValueError with invalid mode_uuid
+            and/or user args.
+        """
+        super().__init__(api_url, user=user, **kwargs)
+        if model_uuid is None:
+            raise ValueError("A valid model_uuid must be specified")
+        self.model_uuid = model_uuid
+
+    @property
+    def endpoint_path(self) -> str:
+        """Returns base model endpoint path, relative to self.api_url
+
+        :return: endpoint path
+        :rtype: str
+        """
+        return super().endpoint_path + f"/models/{self.model_uuid}"
