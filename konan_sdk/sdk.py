@@ -19,6 +19,7 @@ from konan_sdk.konan_types import (
     KonanDockerImage,
     KonanFeedbackSubmission,
     KonanFeedbacksResult,
+    KonanModelCreationRequest,
     KonanTimeWindow,
 )
 
@@ -54,7 +55,8 @@ class KonanSDK:
         self,
         name: str,
         docker_credentials: KonanDockerCredentials,
-        docker_image: KonanDockerImage
+        docker_image: KonanDockerImage,
+        model_name: str = None,
     ) -> KonanDeploymentCreationResponse:
         """Call the create deployment function
 
@@ -64,9 +66,15 @@ class KonanSDK:
         :type docker_credentials: KonanDockerCredentials
         :param docker_image: docker image information
         :type docker_image: KonanDockerImage
+        :param model_name: name of the live model to create, defaults to None
+        If left as None, will default to the name of the deployment
+        :type model_name: str, optional
         :return: konan_deployment_creation_response
         :rtype: KonanDeploymentCreationResponse
         """
+        # Default model_name to name of deployment if not passed
+        model_name = model_name | name
+
         # check user performed login
         self.auth._post_login_checks()
 
@@ -74,10 +82,18 @@ class KonanSDK:
         self.auth.auto_refresh_token()
 
         deployment_creation_response = CreateDeploymentEndpoint(
-            self.api_url, user=self.auth.user
-        ).request(KonanDeploymentCreationRequest(
-            name, docker_credentials, docker_image
-        ))
+            self.api_url,
+            user=self.auth.user
+        ).request(
+            KonanDeploymentCreationRequest(
+                name,
+                KonanModelCreationRequest(
+                    model_name,
+                    docker_credentials,
+                    docker_image,
+                )
+            )
+        )
         return deployment_creation_response
 
     def predict(

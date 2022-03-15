@@ -78,17 +78,18 @@ class KonanDockerImage():
         self.exposed_port = exposed_port
 
 
-class KonanDeploymentCreationRequest():
-    """Information required to issue a create a new Konan Deployment.
+class KonanModelCreationRequest():
+    """Information required to create a new Konan Model.
     """
     def __init__(
-        self, name: str,
+        self,
+        name: str,
         docker_credentials: KonanDockerCredentials,
-        docker_image: KonanDockerImage
+        docker_image: KonanDockerImage,
     ) -> None:
-        """ Initialize a new KonanDeploymentCreationRequest.
+        """Initialize a new KonanModelCreationRequest.
 
-        :param name: Name of the new Konan Deployment.
+        :param name: Name of the new Konan Mode.
         :type name: str
         :param docker_credentials: Credentials of the Docker Container Registry to use
         :type docker_credentials: KonanDockerCredentials
@@ -98,6 +99,25 @@ class KonanDeploymentCreationRequest():
         self.name = name
         self.docker_credentials = docker_credentials
         self.docker_image = docker_image
+
+
+class KonanDeploymentCreationRequest():
+    """Information required to issue a create a new Konan Deployment.
+    """
+    def __init__(
+        self,
+        name: str,
+        model_creation_request: KonanModelCreationRequest,
+    ) -> None:
+        """ Initialize a new KonanDeploymentCreationRequest.
+
+        :param name: Name of the new Konan Deployment.
+        :type name: str
+        :param model_creation_request: Information required to create a new Konan Model.
+        :type model_creation_request: KonanModelCreationRequest
+        """
+        self.name = name
+        self.model_creation_request = model_creation_request
 
 
 class KonanDeploymentErrorType(Enum):
@@ -126,12 +146,53 @@ class KonanDeploymentError():
         self.message = message
 
 
+class KonanModelState(Enum):
+    """Different states a KonanModel can be in
+
+    :param Enum: [description]
+    :type Enum: [type]
+    """
+    Live = 'live'  #: Model Live State
+    Challenger = 'challenger'  #: Model Challenger State
+    Disabled = 'disabled'  #: Model Disabled State
+    Other = "other"  #: Model Other State
+
+
+class KonanModel():
+    """Konan Model
+    """
+    def __init__(
+        self,
+        uuid: str,
+        name: str,
+        created_at: datetime.datetime,
+        state: KonanModelState,
+    ) -> None:
+        """Initialize a new KonanModel
+
+        :param uuid: UUID of the Konan Mode
+        :type uuid: str
+        :param name: Name of the Konan Mode
+        :type name: str
+        :param created_at: Konan Model creation date and time
+        :type created_at: datetime.datetime
+        :param state: State of the Konan Model
+        :type state: KonanModelState
+        """
+        self.uuid = uuid
+        self.name = name
+        self.created_at = created_at
+        self.state = state
+
+
 class KonanDeployment():
     """Konan Deployment.
     """
     def __init__(
         self,
-        uuid: str, name: str, created_at: datetime.datetime
+        uuid: str,
+        name: str,
+        created_at: datetime.datetime,
     ) -> None:
         """ Initialize a new KonanDeployment.
 
@@ -153,7 +214,9 @@ class KonanDeploymentCreationResponse():
     def __init__(
         self,
         deployment: KonanDeployment,
-        errors: List[KonanDeploymentError], container_logs: str
+        live_model: KonanModel,
+        errors: List[KonanDeploymentError],
+        container_logs: str,
     ) -> None:
         """ Initialize a new KonanDeploymentCreationResponse.
 
@@ -165,6 +228,7 @@ class KonanDeploymentCreationResponse():
         :type container_logs: str
         """
         self.deployment = deployment
+        self.live_model = live_model
         self.errors = errors,
         self.container_logs = container_logs
 
