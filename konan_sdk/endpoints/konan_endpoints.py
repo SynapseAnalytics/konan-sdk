@@ -5,6 +5,7 @@ from konan_sdk.endpoints.base_endpoint import (
     KonanBaseEndpoint,
     KonanBaseGenericDeploymentsEndpoint,
     KonanBaseDeploymentEndpoint,
+    KonanBaseDeploymentGenericModelsEndpoint,
     KonanEndpointOperationEnum,
 )
 from konan_sdk.endpoints.interfaces import (
@@ -267,6 +268,51 @@ class CreateDeploymentEndpoint(
                 ) for error in endpoint_response.json['errors']
             ],
             endpoint_response.json['container_logs'],
+        )
+
+
+class CreateModelEndpoint(
+    KonanBaseDeploymentGenericModelsEndpoint[
+        KonanModelCreationRequest,
+        KonanModel,
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'create-model'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
+    def prepare_request(
+        self, request_object: KonanModelCreationRequest
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(json={
+            'name': request_object.name,
+            'docker_username': request_object.docker_credentials.username,
+            'docker_password': request_object.docker_credentials.password,
+            'image_url': request_object.docker_image.url,
+            'exposed_port': request_object.docker_image.exposed_port,
+        })
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> KonanModel:
+        return KonanModel(
+            endpoint_response.json['uuid'],
+            endpoint_response.json['name'],
+            datetime.datetime.fromisoformat(
+                endpoint_response.json['created_at'],
+            ),
+            string_to_konan_enum(
+                endpoint_response.json['state'],
+                KonanModelState,
+            ),
         )
 
 

@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Tuple, Union
 from konan_sdk.auth import KonanAuth
 from konan_sdk.endpoints.konan_endpoints import (
     CreateDeploymentEndpoint,
+    CreateModelEndpoint,
     DeleteDeployment,
     PredictionEndpoint,
     EvaluateEndpoint,
@@ -19,6 +20,7 @@ from konan_sdk.konan_types import (
     KonanDockerImage,
     KonanFeedbackSubmission,
     KonanFeedbacksResult,
+    KonanModel,
     KonanModelCreationRequest,
     KonanTimeWindow,
 )
@@ -95,6 +97,46 @@ class KonanSDK:
             )
         )
         return deployment_creation_response
+
+    def create_model(
+        self,
+        deployment_uuid: str,
+        name: str,
+        docker_credentials: KonanDockerCredentials,
+        docker_image: KonanDockerImage,
+    ) -> KonanModel:
+        """Call the create model function
+
+        :param deployment_uuid: uuid of the deployment to create the model in
+        :type deployment_uuid: str
+        :param name: name of the model to create
+        :type name: str
+        :param docker_credentials: credentials for the docker registry to use
+        :type docker_credentials: KonanDockerCredentials
+        :param docker_image: docker image information
+        :type docker_image: KonanDockerImage
+        :return: konan_model
+        :rtype: KonanModel
+        """
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        konan_model = CreateModelEndpoint(
+            self.api_url,
+            user=self.auth.user,
+            deployment_uuid=deployment_uuid,
+        ).request(
+            KonanModelCreationRequest(
+                name,
+                docker_credentials,
+                docker_image,
+            )
+        )
+        return deployment_creation_response
+
 
     def predict(
         self,
