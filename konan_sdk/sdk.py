@@ -8,6 +8,7 @@ from konan_sdk.endpoints.konan_endpoints import (
     CreateDeploymentEndpoint,
     CreateModelEndpoint,
     DeleteDeployment,
+    DeleteModelEndpoint,
     PredictionEndpoint,
     EvaluateEndpoint,
     FeedbackEndpoint,
@@ -215,6 +216,30 @@ class KonanSDK:
             deployment_uuid=deployment_uuid, user=self.auth.user
         ).request(feedbacks)
         return feedbacks_result
+
+    def delete_model(
+        self,
+        model_uuid: str,
+    ) -> bool:
+        """Call the delete function for a given model
+        WARNING: Using this method with a valid mode_uuid will DELETE it!!
+        :param model_uuid: uuid of model to delete
+        :type model_uuid: str
+        :return: success
+        :rtype: bool
+        """
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        delete_model_result = DeleteModelEndpoint(
+            self.api_url,
+            user=self.auth.user,
+            model_uuid=model_uuid,
+        ).request(None)
+        return delete_model_result
 
     def delete_deployment(
         self,
