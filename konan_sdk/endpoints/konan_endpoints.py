@@ -23,11 +23,14 @@ from konan_sdk.konan_types import (
     KonanDeploymentCreationResponse,
     KonanDeploymentError,
     KonanDeploymentErrorType,
+    KonanModelState,
+    KonanModel,
     KonanTokens,
     KonanPrediction,
     KonanFeedbackSubmission, KonanFeedbackStatus, KonanFeedbacksResult,
     KonanTimeWindow,
 )
+from konan_sdk.konan_utils.enums import string_to_konan_enum
 
 
 class LoginEndpoint(KonanBaseEndpoint[KonanCredentials, KonanTokens]):
@@ -228,10 +231,11 @@ class CreateDeploymentEndpoint(
     ) -> KonanEndpointRequest:
         return KonanEndpointRequest(json={
             'name': request_object.name,
-            'docker_username': request_object.docker_credentials.username,
-            'docker_password': request_object.docker_credentials.password,
-            'image_url': request_object.docker_image.url,
-            'exposed_port': request_object.docker_image.exposed_port,
+            'model_name': request_object.model_creation_request.name,
+            'docker_username': request_object.model_creation_request.docker_credentials.username,
+            'docker_password': request_object.model_creation_request.docker_credentials.password,
+            'image_url': request_object.model_creation_request.docker_image.url,
+            'exposed_port': request_object.model_creation_request.docker_image.exposed_port,
         })
 
     def process_response(
@@ -245,13 +249,24 @@ class CreateDeploymentEndpoint(
                     endpoint_response.json['deployment']['created_at'],
                 )
             ),
+            KonanModel(
+                endpoint_response.json['deployment']['model']['uuid'],
+                endpoint_response.json['deployment']['model']['name'],
+                datetime.datetime.fromisoformat(
+                    endpoint_response.json['deployment']['model']['created_at'],
+                ),
+                string_to_konan_enum(
+                    endpoint_response.json['deployment']['model']['state'],
+                    KonanModelState,
+                ),
+            ),
             [
                 KonanDeploymentError(
                     KonanDeploymentErrorType(error['field']),
                     error['message'],
                 ) for error in endpoint_response.json['errors']
             ],
-            endpoint_response.json['container_logs']
+            endpoint_response.json['container_logs'],
         )
 
 
