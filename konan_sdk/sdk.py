@@ -285,7 +285,7 @@ class KonanSDK:
         else:
             return self._switch_live_model(
                 deployment_uuid,
-                find_live_model(models), # find the UUID of the live model given the list of models
+                find_live_model(models),  # find the UUID of the live model given the list of models
                 switch_to,
                 models,
                 new_live_model_uuid=new_live_model_uuid,
