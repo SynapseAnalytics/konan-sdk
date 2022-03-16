@@ -25,6 +25,7 @@ from konan_sdk.konan_types import (
     KonanDeploymentCreationResponse,
     KonanDeploymentError,
     KonanDeploymentErrorType,
+    KonanLiveModelSwitchState,
     KonanModelCreationRequest,
     KonanModelState,
     KonanModel,
@@ -233,7 +234,7 @@ class CreateDeploymentEndpoint(
         self, request_object: KonanDeploymentCreationRequest
     ) -> KonanEndpointRequest:
         return KonanEndpointRequest(json={
-            'name': request_object.name,
+            'deployment_name': request_object.name,
             'model_name': request_object.model_creation_request.name,
             'docker_username': request_object.model_creation_request.docker_credentials.username,
             'docker_password': request_object.model_creation_request.docker_credentials.password,
@@ -306,13 +307,13 @@ class CreateModelEndpoint(
         self, endpoint_response: KonanEndpointResponse
     ) -> KonanModel:
         return KonanModel(
-            endpoint_response.json['uuid'],
-            endpoint_response.json['name'],
+            endpoint_response.json['model']['uuid'],
+            endpoint_response.json['model']['name'],
             datetime.datetime.fromisoformat(
-                endpoint_response.json['created_at'],
+                endpoint_response.json['model']['created_at'],
             ),
             string_to_konan_enum(
-                endpoint_response.json['state'],
+                endpoint_response.json['model']['state'],
                 KonanModelState,
             ),
         )
@@ -385,6 +386,73 @@ class DeleteModelEndpoint(
         self, endpoint_response: KonanEndpointResponse
     ) -> bool:
         return True
+
+
+class SwitchLiveModelEndpoint(
+    KonanBaseDeploymentEndpoint[
+        KonanLiveModelSwitchState,
+        None,
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'switch-model-live'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/switch/'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
+    def prepare_request(
+        self, request_object: KonanLiveModelSwitchState
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(
+            json={
+                "switch_to": request_object.switch_to.value,
+                "new_live_model": request_object.new_live_model_uuid,
+            },
+        )
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> None:
+        return None
+
+
+class SwitchNonLiveModelEndpoint(
+    KonanBaseModelEndpoint[
+        KonanModelState,
+        None,
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'switch-model-nonelive'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/switch/'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
+    def prepare_request(
+        self, request_object: KonanModelState
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(
+            json={
+                "switch_to": request_object.value,
+            },
+        )
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> None:
+        return None
 
 
 class DeleteDeployment(
