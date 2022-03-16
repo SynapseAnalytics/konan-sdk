@@ -1,5 +1,6 @@
 from enum import Enum
 from json import JSONDecodeError
+import json
 import requests
 from loguru import logger
 from typing import Dict, Generic, Optional, TypeVar
@@ -120,6 +121,7 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
 
         try:
             response_json = response.json()
+            print(json.dumps(response_json, indent=4, sort_keys=True))
         except JSONDecodeError:
             response_json = None
         endpoint_response = KonanEndpointResponse(
