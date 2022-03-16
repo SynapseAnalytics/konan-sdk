@@ -158,6 +158,25 @@ class KonanModelState(Enum):
     Other = "other"  #: Model Other State
 
 
+class KonanLiveModelSwitchState():
+    """Konan Live Model Switch State
+    """
+    def __init__(
+        self,
+        switch_to: KonanModelState,
+        new_live_model_uuid: str,
+    ) -> None:
+        """Initialize a new KonanLiveModelSwitchState
+
+        :param switch_to: state of model to switch to
+        :type switch_to: KonanModelState
+        :param new_live_model_uuid: UUID of the model to promote to live
+        :type new_live_model_uuid: str
+        """
+        self.switch_to = switch_to
+        self.new_live_model_uuid = new_live_model_uuid
+
+
 class KonanModel():
     """Konan Model
     """
