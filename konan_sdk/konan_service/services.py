@@ -1,6 +1,6 @@
 from typing import List, Type
 
-from fastapi import FastAPI, Response
+from fastapi import FastAPI
 from fastapi_utils.cbv import cbv
 
 from konan_sdk.konan_service.routers import KonanServiceRouter
