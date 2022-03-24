@@ -64,11 +64,8 @@ class KonanService():
             __model = self.model
 
             @router.healthz()
-            def healthz(self) -> Response:
-                return Response(
-                    content="\n",
-                    status_code=200, media_type="text/plain"
-                )
+            def healthz(self) -> str:
+                return "\n"
 
             @router.predict()
             def predict(self, req: predict_request_class) -> predict_response_class:
