@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v1.2.6 (2022-03-24)
+### Fix
+* **konan-service:** Fix healthz response ([`48ffe50`](https://github.com/SynapseAnalytics/konan-sdk/commit/48ffe50d361d8712245ac9c2c8610d04c08cd8ef))
+* **Evaluate:** Fix returning empty metrics ([`48d0c1a`](https://github.com/SynapseAnalytics/konan-sdk/commit/48d0c1a1dd4f28381bf67c0847cfddb13b733516))
+
 ## v1.2.5 (2022-02-14)
 ### Fix
 * **docs:** Add more descriptive doc strings ([`344fc59`](https://github.com/SynapseAnalytics/konan-sdk/commit/344fc59f3401b76fbbd419ff6b98fad7a04520af))
