@@ -1,4 +1,5 @@
 from enum import Enum
+from functools import partial
 from json import JSONDecodeError
 import requests
 from loguru import logger
@@ -15,9 +16,11 @@ ResT = TypeVar('ResT')
 
 
 class KonanEndpointOperationEnum(Enum):
-    GET = requests.get
-    POST = requests.post
-    DELETE = requests.delete
+    def __call__(self, *args, **kwargs):
+        return self.value(*args, **kwargs)
+    GET = partial(requests.get)
+    POST = partial(requests.post)
+    DELETE = partial(requests.delete)
 
 
 class KonanBaseEndpoint(Generic[ReqT, ResT]):

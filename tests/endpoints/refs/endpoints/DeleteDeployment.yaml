@@ -1,0 +1,7 @@
+---
+name: delete-deployment
+endpoint_path: /deployments/<deployment_uuid>/
+endpoint_operation: DELETE
+headers:
+  Content-Type: application/json
+  Authorization: Bearer <access_token>

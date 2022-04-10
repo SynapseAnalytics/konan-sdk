@@ -1,0 +1,7 @@
+---
+name: create-deployment
+endpoint_path: /deployments/
+endpoint_operation: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer <access_token>
