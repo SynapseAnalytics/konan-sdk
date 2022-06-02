@@ -2,6 +2,17 @@
 
 <!--next-version-placeholder-->
 
+## v1.3.0 (2022-06-02)
+### Feature
+* **endpoints:** Add model switch endpoints ([`9cc2276`](https://github.com/SynapseAnalytics/konan-sdk/commit/9cc2276325c4298bf0bba635eb3f7869ae48fb8e))
+* **endpoints:** Add get models endpoint ([`21ca037`](https://github.com/SynapseAnalytics/konan-sdk/commit/21ca0377d349191bf60bf8f95bf1ea709be18e5c))
+* **endpoints:** Add delete model endpoint ([`e588451`](https://github.com/SynapseAnalytics/konan-sdk/commit/e588451ae10ef57a3549d7af6134a531004cefcd))
+* **endpoints:** Add create model endpoint ([`b297b12`](https://github.com/SynapseAnalytics/konan-sdk/commit/b297b12b3276feaa1b0c660cbf1feaeb90d069c1))
+* **deployment:** Add model to create deployments ([`db7c294`](https://github.com/SynapseAnalytics/konan-sdk/commit/db7c29431e9082c3e18947ea84395392bde623be))
+
+### Fix
+* **types:** Add total ordering for KonanModel ([`6b6ff62`](https://github.com/SynapseAnalytics/konan-sdk/commit/6b6ff62f669e9c0b379dd39adacda583904f3f5a))
+
 ## v1.2.6 (2022-03-24)
 ### Fix
 * **konan-service:** Fix healthz response ([`48ffe50`](https://github.com/SynapseAnalytics/konan-sdk/commit/48ffe50d361d8712245ac9c2c8610d04c08cd8ef))
