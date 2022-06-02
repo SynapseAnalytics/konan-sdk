@@ -1,5 +1,6 @@
 import datetime
 from enum import Enum
+from functools import total_ordering
 from typing import Dict, List, Union
 
 
@@ -177,6 +178,7 @@ class KonanLiveModelSwitchState():
         self.new_live_model_uuid = new_live_model_uuid
 
 
+@total_ordering
 class KonanModel():
     """Konan Model
     """
@@ -202,6 +204,22 @@ class KonanModel():
         self.name = name
         self.created_at = created_at
         self.state = state
+
+    def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, KonanModel):
+            return False
+        __other_model: KonanModel = __o
+        return (
+            self.uuid == __other_model.uuid
+            and self.name == __other_model.name
+            and self.created_at == __other_model.created_at
+            and self.state == __other_model.state
+        )
+
+    def __lt__(self, __o: object) -> bool:
+        assert isinstance(__o, KonanModel)
+        __other_model: KonanModel = __o
+        return self.uuid < __other_model.uuid
 
 
 class KonanDeployment():
@@ -243,7 +261,7 @@ class KonanDeploymentCreationResponse():
         :type deployment: KonanDeployment
         :param errors: Errors encountered when attempting to create the new Konan Deployment
         :type errors: List[KonanDeploymentError]
-        :param container_logs: Container logs genered when creating the new Konan Deployment
+        :param container_logs: Container logs generated when creating the new Konan Deployment
         :type container_logs: str
         """
         self.deployment = deployment
