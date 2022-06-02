@@ -242,53 +242,70 @@ class KonanSDK:
     def switch_model_state(
         self,
         deployment_uuid: str,
+        model_uuid: str,
         switch_to: KonanModelState,
-        model_uuid: str = None,
         new_live_model_uuid: str = None,
     ) -> None:
-        # Retreive list of models linked with this deployment
+        """Switch the sate of a Konan Model
+
+        If model_uuid is the UUID of the current Live model then:
+        - it will be demoted to Challenger, and
+        - the parameter new_live_model_uuid is required
+
+        :param deployment_uuid: UUID of deployment
+        :type deployment_uuid: str
+        :param model_uuid: UUID of model to switch
+        :type model_uuid: str
+        :param switch_to: new state to switch mode to. Must be different from the model's current state
+        :type switch_to: KonanModelState
+        :param new_live_model_uuid: _description_, defaults to None.
+        Required only if model_uuid is the UUID of the current Live model
+        :type new_live_model_uuid: str, optional
+        :return: None
+        :rtype: None
+        """
+        # Retrieve list of models linked with this deployment
         models = self.get_models(deployment_uuid)
 
-        # Check if model_uuid is passed
-        # If model_uuid is passed, this means we want to switch its state
-        if model_uuid:
-            model_state = find_model_state(model_uuid, models)
-            assert model_state, (
-                f"Model with uuid {model_uuid} not found",
-                f" within the models of Deployment with uuid {deployment_uuid}",
-            )
-            assert model_state != switch_to, (
-                f"Model with uuid {model_uuid} already at {switch_to} state",
-            )
-            if model_state == KonanModelState.Live:
-                return self._switch_live_model(
-                    deployment_uuid,
-                    model_uuid,
-                    switch_to,
-                    models,
-                    new_live_model_uuid=new_live_model_uuid,
-                )
-            else:
-                # check user performed login
-                self.auth._post_login_checks()
-                # Check if access token is valid and retrieve a new one if needed
-                self.auth.auto_refresh_token()
-                return SwitchNonLiveModelEndpoint(
-                    self.api_url,
-                    user=self.auth.user,
-                    model_uuid=model_uuid,
-                ).request(
-                    switch_to,
-                )
-        # If model_uuid is NOT passed,
-        # this means we want to switch the current live model to another state
-        else:
+        live_model_uuid = find_live_model(
+            models=models,
+        )
+        model_state = find_model_state(model_uuid, models)
+
+        assert model_state, (
+            f"Model with uuid {model_uuid} not found",
+            f" within the models of Deployment with uuid {deployment_uuid}",
+        )
+        assert model_state != switch_to, (
+            f"Model with uuid {model_uuid} already at {switch_to} state",
+        )
+        if model_state == KonanModelState.Live:
             return self._switch_live_model(
-                deployment_uuid,
-                find_live_model(models),  # find the UUID of the live model given the list of models
-                switch_to,
-                models,
+                deployment_uuid=deployment_uuid,
+                live_model_uuid=model_uuid,
+                switch_to=switch_to,
+                models=models,
                 new_live_model_uuid=new_live_model_uuid,
+            )
+        elif switch_to == KonanModelState.Live:
+            return self._switch_live_model(
+                deployment_uuid=deployment_uuid,
+                live_model_uuid=live_model_uuid,
+                switch_to=KonanModelState.Challenger,
+                models=models,
+                new_live_model_uuid=model_uuid,
+            )
+        else:
+            # check user performed login
+            self.auth._post_login_checks()
+            # Check if access token is valid and retrieve a new one if needed
+            self.auth.auto_refresh_token()
+            return SwitchNonLiveModelEndpoint(
+                self.api_url,
+                user=self.auth.user,
+                model_uuid=model_uuid,
+            ).request(
+                switch_to,
             )
 
     def predict(
@@ -324,9 +341,9 @@ class KonanSDK:
 
         :param deployment_uuid: uuid of deployment to use for evaluation
         :type deployment_uuid: str
-        :param start_time: use predictins made at or after this time
+        :param start_time: use predictions made at or after this time
         :type start_time: datetime.datetime
-        :param end_time: use predictins made before or at this time
+        :param end_time: use predictions made before or at this time
         :type end_time: datetime.datetime
         :return: A model evaluation object
         :rtype: EvaluateEndpoint.ResponseObject
