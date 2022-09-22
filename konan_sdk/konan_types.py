@@ -1,7 +1,7 @@
 import datetime
 from enum import Enum
 from functools import total_ordering
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 
 class KonanCredentials():
@@ -37,16 +37,28 @@ class KonanTokens():
 class KonanPrediction():
     """Successful prediction registered with the Konan API.
     """
-    def __init__(self, uuid: str, output: Dict) -> None:
+    def __init__(
+        self,
+        uuid: str,
+        output: Dict[str, Any],
+        features: Optional[Dict[str, Any]] = None,
+        feedback: Optional[Union[str, Dict[str, Any], Any]] = None,
+    ) -> None:
         """ Initialize a new KonanPrediction.
 
         :param uuid: Prediction uuid
         :type uuid: str
         :param output: Live model output
         :type output: Dict
+        :param features: features used to make the Prediction, defaults to None
+        :type features: Optional[Dict[str, Any]], optional
+        :param feedback: Feedback made on the Prediction, defaults to None
+        :type feedback: Optional[Union[str, Dict[str, Any], Any]], optional
         """
         self.uuid = uuid
         self.output = output
+        self.features = features
+        self.feedback = feedback
 
 
 class KonanDockerCredentials():
