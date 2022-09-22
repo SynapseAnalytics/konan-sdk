@@ -9,6 +9,7 @@ from konan_sdk.konan_user import KonanUser
 from konan_sdk.endpoints.interfaces import (
     KonanEndpointRequest, KonanEndpointResponse
 )
+from konan_sdk.konan_types import KonanTokens
 
 ReqT = TypeVar('ReqT')
 ResT = TypeVar('ResT')
@@ -128,6 +129,24 @@ class KonanBaseEndpoint(Generic[ReqT, ResT]):
 
         response_object = self.process_response(endpoint_response)
         return response_object
+
+
+class KonanBaseLoginEndpoint(KonanBaseEndpoint[ReqT, KonanTokens]):
+    @property
+    def endpoint_path(self) -> str:
+        return '/api/auth'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> KonanTokens:
+        return KonanTokens(
+            endpoint_response.json['access'],
+            endpoint_response.json['refresh']
+        )
 
 
 class KonanBaseAuthenticatedEndpoint(KonanBaseEndpoint[ReqT, ResT]):
