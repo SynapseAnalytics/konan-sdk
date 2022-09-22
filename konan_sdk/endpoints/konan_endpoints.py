@@ -1,7 +1,8 @@
 import datetime
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, Generator, List, Union
 
 from konan_sdk.endpoints.base_endpoint import (
+    KonanBaseDeploymentPredictionsEndpoint,
     KonanBaseEndpoint,
     KonanBaseGenericDeploymentsEndpoint,
     KonanBaseDeploymentEndpoint,
@@ -13,6 +14,7 @@ from konan_sdk.endpoints.interfaces import (
     KonanEndpointRequest,
     KonanEndpointResponse,
 )
+from konan_sdk.endpoints.mixins import KonanPaginatedEndpointMixin
 from konan_sdk.konan_metrics import (
     KonanBaseMetric,
     KonanCustomMetric,
@@ -481,3 +483,39 @@ class DeleteDeployment(
         self, endpoint_response: KonanEndpointResponse
     ) -> bool:
         return True
+
+
+class GetPredictionsEndpoint(
+    KonanPaginatedEndpointMixin[KonanTimeWindow, KonanPrediction],
+    KonanBaseDeploymentPredictionsEndpoint[
+        KonanTimeWindow,
+        Generator[List[KonanPrediction], None, None],
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'get-predictions'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/'
+
+    def prepare_request(
+        self, request_object: KonanTimeWindow,
+    ) -> KonanEndpointRequest:
+        return KonanEndpointRequest(params={
+            'start_time': request_object.start_time.isoformat(),
+            'end_time': request_object.end_time.isoformat(),
+        })
+
+    def _process_page(
+        self, results: List[Dict[str, Any]]
+    ) -> List[KonanPrediction]:
+        return [
+            KonanPrediction(
+                uuid=prediction['uuid'],
+                output=prediction['mls_output_json'],
+                features=prediction.get('features_json'),
+                feedback=prediction.get('feedback'),
+            ) for prediction in results
+        ]
