@@ -1,5 +1,6 @@
 import datetime
 import sys
+import deprecated
 from loguru import logger
 from typing import (
     Dict,
@@ -10,7 +11,7 @@ from typing import (
     Union
 )
 
-from konan_sdk.auth import KonanAuth
+from konan_sdk.auth import KonanAPIKeyAuth, KonanAuth
 from konan_sdk.endpoints.konan_endpoints import (
     CreateDeploymentEndpoint,
     CreateModelEndpoint,
@@ -61,15 +62,31 @@ class KonanSDK:
             logger.remove()
             logger.add(sys.stderr, level="INFO")
 
-    def login(self, email: str, password: str) -> None:
-        """Login to Konan with user credentials
+    @deprecated.deprecated(
+        reason='Password-based authentication will be removed in a future release.',
+        version='1.4.0',
+        category=DeprecationWarning,
+    )
+    def login(self, email: str = None, password: str = None, api_key: str = None) -> None:
+        """Login to Konan with _either_ email + password credentails _or_ an API Key.
 
-        :param email: email of registered user
-        :type email: str
-        :param password: password of registered user
-        :type password: str
+        At least one of the two authentication methods *must* be passed.
+        If both methods are passed, API Key authentication is used.
+
+        :param email: email of registered user, defaults to None
+        :type email: str, optional
+        :param password: password of registered user, defaults to None
+        :type password: str, optional
+        :param api_key: API Key of registered user, defaults to None
+        :type api_key: str, optional
         """
-        self.auth = KonanAuth(self.auth_url, email, password)
+        if api_key is None:
+            if email is None or password is None:
+                raise ValueError("Parameters for at least one authentication method must be passed")
+            self.auth = KonanAuth(auth_url=self.auth_url, email=email, password=password)
+        else:
+            self.auth = KonanAPIKeyAuth(auth_url=self.auth_url, api_key=api_key)
+
         self.auth.login()
 
     def create_deployment(
