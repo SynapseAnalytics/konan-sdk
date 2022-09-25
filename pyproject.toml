@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "konan-sdk"
-version = "1.3.0"
+version = "1.4.0"
 description = "Python SDK for Konan's API"
 authors = ["Synapse Analytics"]
 license = "MIT"

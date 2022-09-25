@@ -2,6 +2,15 @@
 
 <!--next-version-placeholder-->
 
+## v1.4.0 (2022-09-25)
+### Feature
+* **project:** Create project alongisde live model ([`ca6c8ba`](https://github.com/SynapseAnalytics/konan-sdk/commit/ca6c8babe6596f4fca4edb77e7a081f15cbeae89))
+* **auth:** Add API Key authentication ([`b05d8d9`](https://github.com/SynapseAnalytics/konan-sdk/commit/b05d8d94df982f0c058bf602d063f4417a2ba18b))
+* **sdk:** Add listing predictions via pagination ([`3248d54`](https://github.com/SynapseAnalytics/konan-sdk/commit/3248d54e4a62ca1927ba0e99fec72ed5d6a8ba64))
+
+### Documentation
+* **integration:** Clarify some comments ([`e56b1cc`](https://github.com/SynapseAnalytics/konan-sdk/commit/e56b1cc0174aade5976a568cccd3e16b7df7db2e))
+
 ## v1.3.0 (2022-06-02)
 ### Feature
 * **endpoints:** Add model switch endpoints ([`9cc2276`](https://github.com/SynapseAnalytics/konan-sdk/commit/9cc2276325c4298bf0bba635eb3f7869ae48fb8e))
