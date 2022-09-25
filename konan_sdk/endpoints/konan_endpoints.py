@@ -32,6 +32,7 @@ from konan_sdk.konan_types import (
     KonanModelCreationRequest,
     KonanModelState,
     KonanModel,
+    KonanProjectCreationRequest,
     KonanPrediction,
     KonanFeedbackSubmission, KonanFeedbackStatus, KonanFeedbacksResult,
     KonanTimeWindow,
@@ -240,14 +241,17 @@ class CreateDeploymentEndpoint(
     def prepare_request(
         self, request_object: KonanDeploymentCreationRequest
     ) -> KonanEndpointRequest:
-        return KonanEndpointRequest(json={
+        request_dict = {
             'deployment_name': request_object.name,
             'model_name': request_object.model_creation_request.name,
-            'docker_username': request_object.model_creation_request.docker_credentials.username,
-            'docker_password': request_object.model_creation_request.docker_credentials.password,
             'image_url': request_object.model_creation_request.docker_image.url,
             'exposed_port': request_object.model_creation_request.docker_image.exposed_port,
-        })
+        }
+        if request_object.model_creation_request.docker_credentials is not None:
+            request_dict['docker_username'] = request_object.model_creation_request.docker_credentials.username
+            request_dict['docker_password'] = request_object.model_creation_request.docker_credentials.password
+
+        return KonanEndpointRequest(json=request_dict)
 
     def process_response(
         self, endpoint_response: KonanEndpointResponse
@@ -281,6 +285,47 @@ class CreateDeploymentEndpoint(
         )
 
 
+class CreateProjectEndpoint(
+    KonanBaseGenericDeploymentsEndpoint[
+        KonanProjectCreationRequest,
+        KonanDeployment
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'create-project'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
+    def prepare_request(
+        self, request_object: KonanProjectCreationRequest
+    ) -> KonanEndpointRequest:
+        request_dict = {
+            'name': request_object.name,
+        }
+        if request_object.description:
+            request_dict['description'] = request_object.description
+
+        return KonanEndpointRequest(json=request_dict)
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> KonanDeployment:
+        return KonanDeployment(
+            endpoint_response.json['uuid'],
+            endpoint_response.json['name'],
+            datetime.datetime.fromisoformat(
+                endpoint_response.json['created_at'],
+            )
+        )
+
+
 class CreateModelEndpoint(
     KonanBaseDeploymentGenericModelsEndpoint[
         KonanModelCreationRequest,
@@ -302,13 +347,17 @@ class CreateModelEndpoint(
     def prepare_request(
         self, request_object: KonanModelCreationRequest
     ) -> KonanEndpointRequest:
-        return KonanEndpointRequest(json={
+        request_dict = {
             'name': request_object.name,
-            'docker_username': request_object.docker_credentials.username,
-            'docker_password': request_object.docker_credentials.password,
             'image_url': request_object.docker_image.url,
             'exposed_port': request_object.docker_image.exposed_port,
-        })
+            'state': request_object.state.value,
+        }
+        if request_object.docker_credentials is not None:
+            request_dict['docker_username'] = request_object.docker_credentials.username
+            request_dict['docker_password'] = request_object.docker_credentials.password
+
+        return KonanEndpointRequest(json=request_dict)
 
     def process_response(
         self, endpoint_response: KonanEndpointResponse
