@@ -11,10 +11,13 @@ from typing import (
     Union
 )
 
+from requests import HTTPError
+
 from konan_sdk.auth import KonanAPIKeyAuth, KonanAuth
 from konan_sdk.endpoints.konan_endpoints import (
     CreateDeploymentEndpoint,
     CreateModelEndpoint,
+    CreateProjectEndpoint,
     DeleteDeployment,
     DeleteModelEndpoint,
     EvaluateEndpoint,
@@ -27,6 +30,7 @@ from konan_sdk.endpoints.konan_endpoints import (
 )
 from konan_sdk.konan_metrics import KonanBaseMetric
 from konan_sdk.konan_types import (
+    KonanDeployment,
     KonanDeploymentCreationRequest,
     KonanDeploymentCreationResponse,
     KonanDockerCredentials,
@@ -38,6 +42,7 @@ from konan_sdk.konan_types import (
     KonanModelCreationRequest,
     KonanModelState,
     KonanPrediction,
+    KonanProjectCreationRequest,
     KonanTimeWindow,
 )
 from konan_sdk.konan_utils.models import (
@@ -89,10 +94,37 @@ class KonanSDK:
 
         self.auth.login()
 
-    def create_deployment(
+    def _create_project(self, name: str, description: str = None) -> KonanDeployment:
+        """Call the create project function
+
+        :param name: name of the project to create
+        :type name: str
+        :param description: description of the project to create, defaults to None
+        :type description: str, optional
+        :return: created Konan project
+        :rtype: KonanDeployment
+        """
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        deployment = CreateProjectEndpoint(
+            self.api_url,
+            user=self.auth.user
+        ).request(
+            KonanProjectCreationRequest(
+                name=name,
+                description=description,
+            )
+        )
+        return deployment
+
+    def _create_deployment(
         self,
         name: str,
-        docker_credentials: KonanDockerCredentials,
+        docker_credentials: Optional[KonanDockerCredentials],
         docker_image: KonanDockerImage,
         model_name: str = None,
     ) -> KonanDeploymentCreationResponse:
@@ -101,7 +133,7 @@ class KonanSDK:
         :param name: name of the deployment to create
         :type name: str
         :param docker_credentials: credentials for the docker registry to use
-        :type docker_credentials: KonanDockerCredentials
+        :type docker_credentials: Optional[KonanDockerCredentials]
         :param docker_image: docker image information
         :type docker_image: KonanDockerImage
         :param model_name: name of the live model to create, defaults to None
@@ -124,22 +156,81 @@ class KonanSDK:
             user=self.auth.user
         ).request(
             KonanDeploymentCreationRequest(
-                name,
-                KonanModelCreationRequest(
+                name=name,
+                description=None,
+                model_creation_request=KonanModelCreationRequest(
                     model_name,
                     docker_credentials,
                     docker_image,
+                    state=KonanModelState.Live,
                 )
             )
         )
         return deployment_creation_response
 
+    @deprecated.deprecated(
+        reason='Creating a Live Model alonside a Deployment will be removed in a future release',
+        version='1.4.0',
+        category=DeprecationWarning,
+    )
+    def create_deployment(
+        self,
+        name: str,
+        docker_credentials: Optional[KonanDockerCredentials],
+        docker_image: KonanDockerImage,
+        model_name: str = None,
+    ) -> KonanDeploymentCreationResponse:
+        """Call the create deployment function
+
+        :param name: name of the deployment to create
+        :type name: str
+        :param docker_credentials: credentials for the docker registry to use
+        :type docker_credentials: Optional[KonanDockerCredentials]
+        :param docker_image: docker image information
+        :type docker_image: KonanDockerImage
+        :param model_name: name of the live model to create, defaults to None
+        If left as None, will default to the name of the deployment
+        :type model_name: str, optional
+        :return: konan_deployment_creation_response
+        :rtype: KonanDeploymentCreationResponse
+        """
+        model_name = model_name or name
+
+        try:
+            return self._create_deployment(
+                name=name,
+                docker_credentials=docker_credentials,
+                docker_image=docker_image,
+                model_name=model_name,
+            )
+        except HTTPError as e:
+            # Heuristic for determining if the Konan API has been updated to use Projects
+            if e.response.status_code == 400:
+                # Retry request but with Project creation
+                deployment = self._create_project(name=name)
+                live_model = self.create_model(
+                    deployment_uuid=deployment.uuid,
+                    name=model_name,
+                    docker_credentials=docker_credentials,
+                    docker_image=docker_image,
+                    model_state=KonanModelState.Live
+                )
+                return KonanDeploymentCreationResponse(
+                    deployment=deployment,
+                    live_model=live_model,
+                    errors=[],
+                    container_logs='',
+                )
+            else:
+                raise e
+
     def create_model(
         self,
         deployment_uuid: str,
         name: str,
-        docker_credentials: KonanDockerCredentials,
+        docker_credentials: Optional[KonanDockerCredentials],
         docker_image: KonanDockerImage,
+        model_state: KonanModelState = KonanModelState.Challenger,
     ) -> KonanModel:
         """Call the create model function
 
@@ -148,9 +239,11 @@ class KonanSDK:
         :param name: name of the model to create
         :type name: str
         :param docker_credentials: credentials for the docker registry to use
-        :type docker_credentials: KonanDockerCredentials
+        :type docker_credentials: Optional[KonanDockerCredentials]
         :param docker_image: docker image information
         :type docker_image: KonanDockerImage
+        :param model_state: state in which to create the Model, defaults to KonanModelState.Challenger
+        :type model_state: KonanModelState, optional
         :return: konan_model
         :rtype: KonanModel
         """
@@ -169,6 +262,7 @@ class KonanSDK:
                 name,
                 docker_credentials,
                 docker_image,
+                state=model_state,
             )
         )
         return konan_model

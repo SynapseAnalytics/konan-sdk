@@ -91,45 +91,81 @@ class KonanDockerImage():
         self.exposed_port = exposed_port
 
 
+class KonanModelState(Enum):
+    """Different states a KonanModel can be in
+
+    :param Enum: [description]
+    :type Enum: [type]
+    """
+    Live = 'live'  #: Model Live State
+    Challenger = 'challenger'  #: Model Challenger State
+    Disabled = 'disabled'  #: Model Disabled State
+    Other = "other"  #: Model Other State
+
+
 class KonanModelCreationRequest():
     """Information required to create a new Konan Model.
     """
     def __init__(
         self,
         name: str,
-        docker_credentials: KonanDockerCredentials,
+        docker_credentials: Optional[KonanDockerCredentials],
         docker_image: KonanDockerImage,
+        state: KonanModelState
     ) -> None:
         """Initialize a new KonanModelCreationRequest.
 
         :param name: Name of the new Konan Mode.
         :type name: str
         :param docker_credentials: Credentials of the Docker Container Registry to use
-        :type docker_credentials: KonanDockerCredentials
+        :type docker_credentials: Optional[KonanDockerCredentials]
         :param docker_image: Docker Image to use as the Konan Model
         :type docker_image: KonanDockerImage
         """
         self.name = name
         self.docker_credentials = docker_credentials
         self.docker_image = docker_image
+        self.state = state
 
 
-class KonanDeploymentCreationRequest():
+class KonanProjectCreationRequest():
+    """Information required to issue a create a new Konan Project.
+    """
+    def __init__(
+        self,
+        name: str,
+        description: Optional[str],
+    ) -> None:
+        """ Initialize a new KonanProjectCreationRequest.
+
+        :param name: Name of the new Konan Project.
+        :type name: str
+        :param description: Description of the new Konan Project.
+        :type description: str
+        """
+        self.name = name
+        self.description = description
+
+
+class KonanDeploymentCreationRequest(KonanProjectCreationRequest):
     """Information required to issue a create a new Konan Deployment.
     """
     def __init__(
         self,
         name: str,
+        description: Optional[str],
         model_creation_request: KonanModelCreationRequest,
     ) -> None:
         """ Initialize a new KonanDeploymentCreationRequest.
 
-        :param name: Name of the new Konan Deployment.
+        :param name: Name of the new Konan Project.
         :type name: str
+        :param description: Description of the new Konan Project.
+        :type description: str
         :param model_creation_request: Information required to create a new Konan Model.
         :type model_creation_request: KonanModelCreationRequest
         """
-        self.name = name
+        super().__init__(name=name, description=description)
         self.model_creation_request = model_creation_request
 
 
@@ -157,18 +193,6 @@ class KonanDeploymentError():
         """
         self.type = type
         self.message = message
-
-
-class KonanModelState(Enum):
-    """Different states a KonanModel can be in
-
-    :param Enum: [description]
-    :type Enum: [type]
-    """
-    Live = 'live'  #: Model Live State
-    Challenger = 'challenger'  #: Model Challenger State
-    Disabled = 'disabled'  #: Model Disabled State
-    Other = "other"  #: Model Other State
 
 
 class KonanLiveModelSwitchState():
