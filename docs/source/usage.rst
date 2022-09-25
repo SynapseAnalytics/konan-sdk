@@ -25,7 +25,8 @@ For example:
 
    sdk = KonanSDK(verbose=False) # Initialize the SDK.
 
-   user = sdk.login("<email>", "<password>") # Login user your valid konan credentials
+   user = sdk.login(api_key="<api-key>")  # Login user your valid konan API Key
+   # user = sdk.login(email="<email>", password="<password>") # Login user your valid Konan credentials
 
    input_data = {"feature_1": 1, "feature_2": "abc", } # Define the input data to be passed to your model
 
@@ -46,7 +47,8 @@ also maintaining low request latency and response size.
    from konan_sdk.sdk import KonanSDK
 
    sdk = KonanSDK(verbose=False) # Initialize the SDK.
-   user = sdk.login("<email>", "<password>") # Login user your valid konan credentials
+   user = sdk.login(api_key="<api-key>")  # Login user your valid konan API Key
+   # user = sdk.login(email="<email>", password="<password>") # Login user your valid Konan credentials
 
    predictions_generator = sdk.get_predictions(
       deployment_uuid="<deployment-uuid>",
@@ -55,7 +57,9 @@ also maintaining low request latency and response size.
    )
 
    for predictions in predictions_generator:
+      # predictions is a list of KonanPrediction objects
       print(len(predictions))
+      # Inspect the first KonanPrediction in the list
       print(predictions[0].uuid, predictions[0].features)
       print(predictions[0].output, predictions[0].feedback)
 
