@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.4.1 (2022-09-27)
+### Fix
+* **project:** Fix minor bug ([`d3af031`](https://github.com/SynapseAnalytics/konan-sdk/commit/d3af031bf3396cad281e0ba2660024a583da581e))
+
 ## v1.4.0 (2022-09-25)
 ### Feature
 * **project:** Create project alongisde live model ([`ca6c8ba`](https://github.com/SynapseAnalytics/konan-sdk/commit/ca6c8babe6596f4fca4edb77e7a081f15cbeae89))

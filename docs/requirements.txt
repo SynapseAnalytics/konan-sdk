@@ -1,1 +1,1 @@
-konan_sdk==1.4.0
+konan_sdk==1.4.1
