@@ -9,7 +9,7 @@ from konan_sdk.endpoints.base_endpoint import (
     KonanBaseDeploymentGenericModelsEndpoint,
     KonanBaseModelEndpoint,
     KonanBaseLoginEndpoint,
-    KonanEndpointOperationEnum,
+    KonanEndpointOperationEnum, KonanBaseDeploymentRetrainingJobEndpoint,
 )
 from konan_sdk.endpoints.interfaces import (
     KonanEndpointRequest,
@@ -35,7 +35,7 @@ from konan_sdk.konan_types import (
     KonanProjectCreationRequest,
     KonanPrediction,
     KonanFeedbackSubmission, KonanFeedbackStatus, KonanFeedbacksResult,
-    KonanTimeWindow,
+    KonanTimeWindow, KonanRetrainingJobCreationRequest, KonanRetrainingJob, KonanRetrainingJobStatus,
 )
 from konan_sdk.konan_utils.enums import string_to_konan_enum
 
@@ -573,3 +573,62 @@ class GetPredictionsEndpoint(
                 feedback=prediction.get('feedback'),
             ) for prediction in results
         ]
+
+
+class CreateRetrainingJobEndpoint(
+    KonanBaseDeploymentRetrainingJobEndpoint[
+        KonanRetrainingJobCreationRequest,
+        KonanRetrainingJob,
+    ]
+):
+    @property
+    def name(self) -> str:
+        return 'create-retraining-job'
+
+    @property
+    def endpoint_path(self) -> str:
+        return super().endpoint_path + '/'
+
+    @property
+    def endpoint_operation(self) -> KonanEndpointOperationEnum:
+        return KonanEndpointOperationEnum.POST
+
+    def prepare_request(
+        self, request_object: KonanRetrainingJobCreationRequest
+    ) -> KonanEndpointRequest:
+        request_dict = {
+            "append_training_data": request_object.append_training_data,
+            "resulting_model_state": request_object.resulting_model_state.value
+        }
+        if request_object.predictions_start_time is not None:
+            request_dict["predictions_start_time"] = request_object.predictions_start_time
+        if request_object.predictions_end_time is not None:
+            request_dict["predictions_end_time"] = request_object.predictions_end_time
+        if request_object.resulting_model_name is not None:
+            request_dict["resulting_model_name"] = request_object.resulting_model_name
+
+        return KonanEndpointRequest(json=request_dict)
+
+    def process_response(
+        self, endpoint_response: KonanEndpointResponse
+    ) -> KonanRetrainingJob:
+        return KonanRetrainingJob(
+            endpoint_response.json["uuid"],
+            datetime.datetime.fromisoformat(
+                endpoint_response.json['created_at'],
+            ),
+            endpoint_response.json["resulting_model_name"],
+            endpoint_response.json["resulting_model_state"],
+            string_to_konan_enum(
+                endpoint_response.json['status'],
+                KonanRetrainingJobStatus,
+            ),
+            endpoint_response.json["resulting_model"],
+            endpoint_response.json["duration"],
+            endpoint_response.json["started_at"],
+            endpoint_response.json["ended_at"],
+            endpoint_response.json["cancelled_at"],
+            endpoint_response.json["metrics"],
+            endpoint_response.json["test_percentage"],
+            endpoint_response.json["eval_percentage"],
+        )

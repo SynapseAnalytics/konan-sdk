@@ -26,7 +26,7 @@ from konan_sdk.endpoints.konan_endpoints import (
     GetPredictionsEndpoint,
     PredictionEndpoint,
     SwitchLiveModelEndpoint,
-    SwitchNonLiveModelEndpoint,
+    SwitchNonLiveModelEndpoint, CreateRetrainingJobEndpoint,
 )
 from konan_sdk.konan_metrics import KonanBaseMetric
 from konan_sdk.konan_types import (
@@ -43,7 +43,7 @@ from konan_sdk.konan_types import (
     KonanModelState,
     KonanPrediction,
     KonanProjectCreationRequest,
-    KonanTimeWindow,
+    KonanTimeWindow, KonanRetrainingJob, KonanRetrainingJobCreationRequest,
 )
 from konan_sdk.konan_utils.models import (
     find_live_model,
@@ -565,3 +565,43 @@ class KonanSDK:
         ).get_pages(request_object=KonanTimeWindow(start_time, end_time))
 
         return predictions_generator
+
+    def create_retraining_job(
+        self,
+        deployment_uuid: str,
+        predictions_start_time: datetime.datetime = None,
+        predictions_end_time: datetime.datetime = None,
+        append_training_data: bool = True,
+        resulting_model_name: str = None,
+        resulting_model_state: KonanModelState = KonanModelState.Challenger
+    ) -> KonanRetrainingJob:
+        """Call the CreateRetrainingJob function.
+
+        :param deployment_uuid: uuid of the target deployment
+        :param predictions_start_time: The first day from which to consider predictions
+        :param predictions_end_time: The last day to which consider predictions
+        :param append_training_data: whether to use model's training data in retraining
+        :param resulting_model_name: name of the model to be created as a result of this RetrainingJob
+        :param resulting_model_state: state of the model to be created as a result of this RetrainingJob
+        :return: KonanRetrainingJob instance
+        """
+        # check user performed login
+        self.auth._post_login_checks()
+
+        # Check if access token is valid and retrieve a new one if needed
+        self.auth.auto_refresh_token()
+
+        konan_retraining_job = CreateRetrainingJobEndpoint(
+            self.api_url,
+            user=self.auth.user,
+            deployment_uuid=deployment_uuid,
+        ).request(
+            KonanRetrainingJobCreationRequest(
+                predictions_start_time,
+                predictions_end_time,
+                append_training_data,
+                resulting_model_name,
+                resulting_model_state
+            )
+        )
+        return konan_retraining_job

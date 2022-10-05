@@ -379,3 +379,114 @@ class KonanFeedbacksResult():
         self.success_count = success_count
         self.failure_count = failure_count
         self.total_count = total_count
+
+
+class KonanRetrainingJobStatus(Enum):
+    """Different states a KonanRetrainingJob can be in.
+
+    :param Enum: [description]
+    :type Enum: [type]
+    """
+    PENDING = "PENDING"
+    RUNNING = "RUNNING"
+    SUCCEEDED = "SUCCEEDED"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+    Other = "other"
+
+
+class KonanRetrainingJobCreationRequest:
+    """Information required to create a new Konan RetrainingJob.
+    """
+    def __init__(
+        self,
+        predictions_start_time: Optional[datetime.datetime],
+        predictions_end_time: Optional[datetime.datetime],
+        append_training_data: Optional[bool],
+        resulting_model_name: Optional[str],
+        resulting_model_state: Optional[KonanModelState]
+    ) -> None:
+        """Initialize a new KonanRetrainingJobCreationRequest.
+
+        :param predictions_start_time: The first day from which to consider predictions
+        :type predictions_start_time: datetime.datetime
+        :param predictions_end_time: The last day to which consider predictions
+        :type predictions_end_time: datetime.datetime
+        :param append_training_data: whether to include the model's TrainingData in the RetrainingJob
+        :type append_training_data: bool
+        :param resulting_model_name: the name of the model created as a result of the RetrainingJob
+        :type resulting_model_name: str
+        :param resulting_model_state: the state of the model created as a result of the RetrainingJob
+        :type resulting_model_state: KonanModelState
+        """
+        self.predictions_start_time = predictions_start_time
+        self.predictions_end_time = predictions_end_time
+        self.append_training_data = append_training_data
+        self.resulting_model_name = resulting_model_name
+        self.resulting_model_state = resulting_model_state
+
+
+class KonanRetrainingJob:
+    """Konan RetrainingJob."""
+    def __init__(
+        self,
+        uuid: str,
+        created_at: datetime.datetime,
+        resulting_model_name: str,
+        resulting_model_state: KonanModelState,
+        status: KonanRetrainingJobStatus,
+        resulting_model: str = None,
+        duration: float = None,
+        started_at: datetime.datetime = None,
+        ended_at: datetime.datetime = None,
+        cancelled_at: datetime.datetime = None,
+        metrics: str = None,
+        test_percentage: float = None,
+        train_percentage: float = None,
+        eval_percentage: float = None,
+    ) -> None:
+        """Initialize a new KonanRetrainingJob.
+
+        :param uuid: job UUID
+        :type uuid: uuid.uuid4
+        :param created_at: job creation date
+        :type created_at: datetime.datetime
+        :param resulting_model_name: name of the model to be created as result of this RetrainingJob
+        :type resulting_model_name: str
+        :param resulting_model_state: state of the model to be created as a result of this RetrainingJob
+        :type resulting_model_state: KonanModelState
+        :param status: job status
+        :type status: KonanRetrainingJobStatus
+        :param resulting_model: id of the created model as result of this RetrainingJob
+        :type resulting_model: str
+        :param duration: job duration
+        :type duration: int
+        :param started_at: job start date
+        :type started_at: datetime.datetime
+        :param ended_at: job end date
+        :type ended_at: datetime.datetime
+        :param cancelled_at: job cancellation date
+        :type cancelled_at: datetime.datetime
+        :param metrics: metrics data resulted from the RetrainingJob
+        :type metrics: str
+        :param test_percentage: percentage of test data
+        :type test_percentage: float
+        :param train_percentage: percentage of train data
+        :type train_percentage: float
+        :param eval_percentage: percentage of evaluation data
+        :type eval_percentage: float
+        """
+        self.uuid = uuid
+        self.created_at = created_at
+        self.resulting_model_name = resulting_model_name
+        self.resulting_model_state = resulting_model_state
+        self.status = status
+        self.resulting_model = resulting_model
+        self.duration = duration
+        self.started_at = started_at
+        self.ended_at = ended_at
+        self.cancelled_at = cancelled_at
+        self.metrics = metrics
+        self.test_percentage = test_percentage
+        self.train_percentage = train_percentage
+        self.eval_percentage = eval_percentage
