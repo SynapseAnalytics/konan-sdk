@@ -271,6 +271,28 @@ class KonanBaseDeploymentGenericModelsEndpoint(
         return super().endpoint_path + "/models"
 
 
+class KonanBaseDeploymentRetrainingJobEndpoint(
+    KonanBaseDeploymentEndpoint[ReqT, ResT]
+):
+    """Base Endpoint class for Konan endpoints that deal with
+    a specific deployment's RetrainingJobs.
+
+    :param ReqT: type of request_object to use in .get() and .post() methods
+    :type ReqT: type
+    :param ResT: type of object that .get() and .post() methods return
+    :type ResT: type
+    """
+    @property
+    def endpoint_path(self) -> str:
+        """Returns base specific deployment's RetrainingJobs endpoints path,
+        relative to self.api_url
+
+        :return: endpoint path
+        :rtype: str
+        """
+        return super().endpoint_path + "/retraining"
+
+
 class KonanBaseDeploymentPredictionsEndpoint(
     KonanBaseDeploymentEndpoint[ReqT, ResT]
 ):
