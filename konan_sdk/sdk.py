@@ -14,19 +14,23 @@ from typing import (
 from requests import HTTPError
 
 from konan_sdk.auth import KonanAPIKeyAuth, KonanAuth
-from konan_sdk.endpoints.konan_endpoints import (
+from konan_sdk.endpoints.deployments import (
     CreateDeploymentEndpoint,
-    CreateModelEndpoint,
     CreateProjectEndpoint,
-    DeleteDeployment,
-    DeleteModelEndpoint,
     EvaluateEndpoint,
-    FeedbackEndpoint,
+    DeleteDeployment,
+)
+from konan_sdk.endpoints.models import (
+    CreateModelEndpoint,
+    DeleteModelEndpoint,
     GetModelsEndpoint,
-    GetPaginatedPredictionsEndpoint,
-    PredictionEndpoint,
     SwitchLiveModelEndpoint,
     SwitchNonLiveModelEndpoint,
+)
+from konan_sdk.endpoints.predictions import (
+    FeedbackEndpoint,
+    GetPaginatedPredictionsEndpoint,
+    PredictionEndpoint,
 )
 from konan_sdk.konan_metrics import KonanBaseMetric
 from konan_sdk.konan_types import (

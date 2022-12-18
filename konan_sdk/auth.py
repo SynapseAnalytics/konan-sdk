@@ -6,9 +6,7 @@ from konan_sdk.konan_types import KonanCredentials
 import deprecated
 
 from konan_sdk.konan_user import KonanUser
-from konan_sdk.endpoints.konan_endpoints import (
-    APIKeyLoginEndpoint, LoginEndpoint, RefreshTokenEndpoint
-)
+from konan_sdk.endpoints.auth import APIKeyLoginEndpoint, LoginEndpoint, RefreshTokenEndpoint
 
 
 class _AbstractKonanAuth():
