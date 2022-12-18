@@ -2,6 +2,11 @@
 
 <!--next-version-placeholder-->
 
+## v1.4.2 (2022-12-18)
+### Fix
+* **predictions:** Fix token expiry with too many ([`33d4f85`](https://github.com/SynapseAnalytics/konan-sdk/commit/33d4f85ff00ed3cc177c6c135e511b5865a536cd))
+* **predictions:** Remove duplicate query params ([`1b562ac`](https://github.com/SynapseAnalytics/konan-sdk/commit/1b562ace11adee0a01a99110b06d7d4e0808759f))
+
 ## v1.4.1 (2022-09-27)
 ### Fix
 * **project:** Fix minor bug ([`d3af031`](https://github.com/SynapseAnalytics/konan-sdk/commit/d3af031bf3396cad281e0ba2660024a583da581e))
