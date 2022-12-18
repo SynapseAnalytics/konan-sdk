@@ -540,7 +540,6 @@ class DeleteDeployment(
 
 
 class GetPredictionsEndpoint(
-    KonanPaginatedEndpointMixin[KonanTimeWindow, KonanPrediction],
     KonanBaseDeploymentPredictionsEndpoint[
         KonanTimeWindow,
         Generator[List[KonanPrediction], None, None],
@@ -562,6 +561,11 @@ class GetPredictionsEndpoint(
             'end_time': request_object.end_time.isoformat(),
         })
 
+
+class GetPaginatedPredictionsEndpoint(
+    KonanPaginatedEndpointMixin[KonanTimeWindow, KonanPrediction],
+    GetPredictionsEndpoint,
+):
     def _process_page(
         self, results: List[Dict[str, Any]]
     ) -> List[KonanPrediction]:

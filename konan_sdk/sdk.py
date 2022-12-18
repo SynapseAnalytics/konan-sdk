@@ -23,7 +23,7 @@ from konan_sdk.endpoints.konan_endpoints import (
     EvaluateEndpoint,
     FeedbackEndpoint,
     GetModelsEndpoint,
-    GetPredictionsEndpoint,
+    GetPaginatedPredictionsEndpoint,
     PredictionEndpoint,
     SwitchLiveModelEndpoint,
     SwitchNonLiveModelEndpoint,
@@ -559,7 +559,7 @@ class KonanSDK:
         # Check if access token is valid and retrieve a new one if needed
         self.auth.auto_refresh_token()
 
-        predictions_generator = GetPredictionsEndpoint(
+        predictions_generator = GetPaginatedPredictionsEndpoint(
             api_url=self.api_url,
             deployment_uuid=deployment_uuid, user=self.auth.user
         ).get_pages(request_object=KonanTimeWindow(start_time, end_time))

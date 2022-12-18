@@ -2,7 +2,7 @@
 from typing import Generator, Generic, List, Optional, TypeVar
 
 from konan_sdk.endpoints.base_endpoint import KonanEndpointOperationEnum
-from konan_sdk.endpoints.interfaces import KonanEndpointResponse
+from konan_sdk.endpoints.interfaces import KonanEndpointRequest, KonanEndpointResponse
 
 ReqT = TypeVar('ReqT')
 ResT = TypeVar('ResT')
@@ -31,6 +31,17 @@ class KonanPaginatedEndpointMixin(Generic[ReqT, ResT]):
 
         results: List[ResT] = self._process_page(results=endpoint_response.json.get('results', []))
         return results
+
+    def prepare_request(self, request_object: ReqT) -> KonanEndpointRequest:
+        # NOTE When using a paginated endpoint, `konan-backend` gives us the `next_page` URL which already includes the
+        # the query parameters in it.
+        #
+        # As such, need to override the prepare_request() method to remove the `params`,
+        # but not for the "initial" hit on the endpoint.
+        endpoint_request: KonanEndpointRequest = super().prepare_request(request_object=request_object)
+        if self._next_url is not None:
+            endpoint_request.params = None
+        return endpoint_request
 
     def get_pages(self, request_object: ReqT) -> Generator[List[ResT], None, None]:
         # TODO: refactor prepare_request to allow to dynamically set page_size
