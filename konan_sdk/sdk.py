@@ -564,6 +564,7 @@ class KonanSDK:
         self.auth.auto_refresh_token()
 
         predictions_generator = GetPaginatedPredictionsEndpoint(
+            auth_object=self.auth,
             api_url=self.api_url,
             deployment_uuid=deployment_uuid, user=self.auth.user
         ).get_pages(request_object=KonanTimeWindow(start_time, end_time))

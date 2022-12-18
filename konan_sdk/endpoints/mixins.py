@@ -1,6 +1,7 @@
 
 from typing import Generator, Generic, List, Optional, TypeVar
 
+from konan_sdk.auth import _AbstractKonanAuth
 from konan_sdk.endpoints.base_endpoint import KonanEndpointOperationEnum
 from konan_sdk.endpoints.interfaces import KonanEndpointRequest, KonanEndpointResponse
 
@@ -9,9 +10,10 @@ ResT = TypeVar('ResT')
 
 
 class KonanPaginatedEndpointMixin(Generic[ReqT, ResT]):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, auth_object: Optional[_AbstractKonanAuth], **kwargs) -> None:
         # self._count: Optional[int] = None
         self._next_url: Optional[str] = None
+        self._auth_object: Optional[_AbstractKonanAuth] = auth_object
         # self._previous_url: Optional[str] = None
 
         super().__init__(*args, **kwargs)
@@ -48,5 +50,7 @@ class KonanPaginatedEndpointMixin(Generic[ReqT, ResT]):
         first_page: List[ResT] = self.request(request_object=request_object)
         yield first_page
         while self._next_url is not None:
+            if self._auth_object is not None:
+                self._auth_object.auto_refresh_token()
             next_page: List[ResT] = self.request(request_object=request_object)
             yield next_page
