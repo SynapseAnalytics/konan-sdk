@@ -2,6 +2,15 @@
 
 
 
+## v1.5.1 (2024-02-28)
+
+### Fix
+
+* fix(actions): remove extra line
+
+Signed-off-by: Mohamed Tawfik &lt;mtawfik@synapse-analytics.io&gt; ([`e820da1`](https://github.com/SynapseAnalytics/konan-sdk/commit/e820da1f95d60b7b9a0220e2d019c24cacde420a))
+
+
 ## v1.5.0 (2024-02-28)
 
 ### Chore
