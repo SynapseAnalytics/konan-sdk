@@ -130,5 +130,5 @@ class GetPaginatedPredictionsEndpoint(
                 output=prediction['mls_output_json'],
                 features=prediction.get('features_json'),
                 feedback=prediction.get('feedback'),
-            ) for prediction in results
+            ) for prediction in results["outputs"]
         ]
