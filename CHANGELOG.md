@@ -2,6 +2,15 @@
 
 
 
+## v1.5.2 (2024-02-28)
+
+### Fix
+
+* fix(actions): use supported actions for releases
+
+Signed-off-by: Mohamed Tawfik &lt;mtawfik@synapse-analytics.io&gt; ([`7e4d20b`](https://github.com/SynapseAnalytics/konan-sdk/commit/7e4d20b93f880e041e7b0f8246fb36d636dd08ef))
+
+
 ## v1.5.1 (2024-02-28)
 
 ### Fix
