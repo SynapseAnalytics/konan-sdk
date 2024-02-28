@@ -46,8 +46,19 @@ jobs:
         with:
           fetch-depth: 0
       - name: Python Semantic Release
+        id: release
         uses: relekang/python-semantic-release@v8.3.0
         with:
           github_token: ${{ secrets.GH_TOKEN }}
-          repository_username: __token__
-          repository_password: ${{ secrets.PYPI_TOKEN }}
+      - name: Publish package distributions to PyPI
+        id: pypi
+        uses: pypa/gh-action-pypi-publish@v1.8.12
+        if: steps.release.outputs.released == 'true'
+        with:
+          password: ${{ secrets.PYPI_TOKEN }}
+      - name: Publish package distributions to GitHub Releases
+        id: github
+        uses: python-semantic-release/upload-to-gh-release@main
+        if: steps.release.outputs.released == 'true'
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
