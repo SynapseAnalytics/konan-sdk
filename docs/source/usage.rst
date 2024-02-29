@@ -12,6 +12,30 @@ To use konan-sdk, first install it using pip:
 
    (.venv) $ pip install konan-sdk
 
+On-Prem Deployments
+-------------------
+
+If your Konan instance is hosted on premises, it might be using a custom self-signed SSL
+certificate. If that is the case, you'd need to instruct ``requests`` to trust the signing CA.
+You may check the relevant documentation [here](https://requests.readthedocs.io/en/latest/user/advanced/#ssl-cert-verification),
+but one easy way to do so is to export the ``REQUESTS_CA_BUNDLE`` variable.
+
+For example:
+
+.. code-block:: bash
+
+   export REQUESTS_CA_BUNDLE=/path/to/your/certificate.pem
+
+Of course, don't forget to use your custom ``auth_url`` and ``api_url`` when initializing a ``KonanSDK`` object.
+
+For example:
+
+.. code-block:: python
+
+   from konan_sdk.sdk import KonanSDK
+
+   sdk = KonanSDK(auth_url="https://auth.konan.onprem.local", api_url="https://api.konan.onprem.local")
+
 Making a prediction
 -------------------
 
