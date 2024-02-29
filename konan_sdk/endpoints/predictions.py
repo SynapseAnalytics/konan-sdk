@@ -126,9 +126,9 @@ class GetPaginatedPredictionsEndpoint(
     ) -> List[KonanPrediction]:
         return [
             KonanPrediction(
-                uuid=prediction['uuid'],
-                output=prediction['mls_output_json'],
+                uuid=prediction.get('uuid'),
+                output=prediction.get('mls_output_json'),
                 features=prediction.get('features_json'),
                 feedback=prediction.get('feedback'),
-            ) for prediction in results["outputs"]
+            ) for prediction in results["outputs"] if isinstance(prediction, dict)
         ]
