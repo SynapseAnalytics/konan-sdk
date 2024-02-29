@@ -2,6 +2,15 @@
 
 
 
+## v1.5.3 (2024-02-29)
+
+### Fix
+
+* fix(predictions): handle None predictions
+
+Signed-off-by: Mohamed Tawfik &lt;mtawfik@synapse-analytics.io&gt; ([`06325d7`](https://github.com/SynapseAnalytics/konan-sdk/commit/06325d7fe5d8b6e37db85c062fe3dede217166e6))
+
+
 ## v1.5.2 (2024-02-28)
 
 ### Fix
