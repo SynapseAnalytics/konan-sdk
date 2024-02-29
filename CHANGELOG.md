@@ -2,6 +2,15 @@
 
 
 
+## v1.6.0 (2024-02-29)
+
+### Feature
+
+* feat(sdk): add support for on-prem installations
+
+Signed-off-by: Mohamed Tawfik &lt;mtawfik@synapse-analytics.io&gt; ([`3a22d4f`](https://github.com/SynapseAnalytics/konan-sdk/commit/3a22d4f9e49bcd192cb167426a5d3dd70ef5b69f))
+
+
 ## v1.5.3 (2024-02-29)
 
 ### Fix
